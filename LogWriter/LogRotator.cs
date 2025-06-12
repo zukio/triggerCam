@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace micNotifyUDP.LogWriter
+namespace triggerCam.LogWriter
 {
     /// <summary>
     /// ログファイルのローテーションを管理するクラス

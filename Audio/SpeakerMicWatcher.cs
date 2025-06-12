@@ -9,7 +9,7 @@ MicrophoneCaptureでは：
 using NAudio.CoreAudioApi;
 using System.Text.RegularExpressions;
 
-namespace micNotifyUDP.Audio
+namespace triggerCam.Audio
 {
     internal class WatcherManager
     {

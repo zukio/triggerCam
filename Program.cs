@@ -1,10 +1,10 @@
 using System;
 using System.Net.Sockets;
 using System.Windows.Forms;
-using micNotifyUDP.Camera;
-using micNotifyUDP.Settings;
+using triggerCam.Camera;
+using triggerCam.Settings;
 
-namespace micNotifyUDP
+namespace triggerCam
 {
     internal static class Program
     {

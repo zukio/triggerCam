@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace micNotifyUDP.Settings
+namespace triggerCam.Settings
 {
     /// <summary>
     /// アプリケーション設定を管理するクラス

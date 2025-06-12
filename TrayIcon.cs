@@ -6,11 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using micNotifyUDP.UDP;
-using micNotifyUDP.Audio;
-using micNotifyUDP.Settings;
+using triggerCam.UDP;
+using triggerCam.Audio;
+using triggerCam.Settings;
 
-namespace micNotify
+namespace triggerCam
 {
     public partial class TrayIcon : Component
     {

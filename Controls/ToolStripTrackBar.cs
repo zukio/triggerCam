@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace micNotify.Controls
+namespace triggerCam.Controls
 {
     /// <summary>
     /// ToolStripに配置できるTrackBarコントロール

@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace micNotifyUDP.Audio
+namespace triggerCam.Audio
 {
     /// <summary>
     /// マイクデバイスの再接続を管理するクラス
