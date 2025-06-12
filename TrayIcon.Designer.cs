@@ -1,4 +1,5 @@
-﻿﻿using System.Windows.Forms;
+// filepath: n:\data\WPF\triggerCam\TrayIcon.Designer.cs
+using System.Windows.Forms;
 using triggerCam.Controls;
 
 namespace triggerCam
@@ -30,7 +31,8 @@ namespace triggerCam
         /// コード エディターで変更しないでください。
         /// </summary>
         private void InitializeComponent()
-        {              this.components = new System.ComponentModel.Container();
+        {            
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrayIcon));
             this.context = new ContextMenuStrip(this.components);
             this.contextMenu_comPortContainer = new HorizontalLayoutToolStripItem("COMポート:", 120);
@@ -39,32 +41,37 @@ namespace triggerCam
             this.contextMenu_triggerStart = new ToolStripButton();
             this.contextMenu_triggerStop = new ToolStripButton();
             this.contextMenu_cameraSelect = new ToolStripComboBox();
-            this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("モード:", 100);            this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
+            this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("モード:", 100);
+            this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
             this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
             this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
-            this.contextMenu_address = new ToolStripTextBox();              this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
+            this.contextMenu_address = new ToolStripTextBox();
+            this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
             this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
             this.contextMenu_codecContainer = new HorizontalLayoutToolStripItem("動画コーデック:", 100);
             this.contextMenu_recordingStatus = new ToolStripMenuItem();
             this.contextMenu_save = new ToolStripMenuItem();
             this.contextMenu_exit = new ToolStripMenuItem();
             this.notifyIcon1 = new NotifyIcon(this.components);
-            this.context.SuspendLayout();            // 
+            this.context.SuspendLayout();
+            // 
             // context
             // 
             this.context.AccessibleRole = AccessibleRole.Cursor;
             this.context.BackColor = SystemColors.Window;
-            this.context.ImageScalingSize = new Size(28, 28);              this.context.Items.AddRange(new ToolStripItem[] {
-                                                        this.contextMenu_comPort,
-                                                        this.contextMenu_baudRate,
+            this.context.ImageScalingSize = new Size(28, 28);
+            this.context.Items.AddRange(new ToolStripItem[] {
+                                                        this.contextMenu_comPortContainer,
+                                                        this.contextMenu_baudRateContainer,
                                                         this.contextMenu_triggerSnap,
                                                         this.contextMenu_triggerStart,
                                                         this.contextMenu_triggerStop,
                                                         this.contextMenu_cameraSelect,
-                                                        this.contextMenu_mode,
+                                                        this.contextMenu_modeContainer,
                                                         this.contextMenu_recordingsDirLabel,
                                                         this.contextMenu_recordingsPath,
-                                                        this.contextMenu_openRecordingsDir,                                                        this.contextMenu_address,
+                                                        this.contextMenu_openRecordingsDir,
+                                                        this.contextMenu_address,
                                                         this.contextMenu_cameraSettingsSeparator,
                                                         this.contextMenu_imageFormatContainer,
                                                         this.contextMenu_codecContainer,
@@ -75,17 +82,18 @@ namespace triggerCam
             this.context.Name = "context";
             this.context.Size = new Size(332, 158);
             // 
-            // contextMenu_comPort
+            // contextMenu_comPortContainer
             //
-            this.contextMenu_comPort.Name = "contextMenu_comPort";
-            this.contextMenu_comPort.Size = new Size(160, 38);
-            this.contextMenu_comPort.Text = "COM";
+            this.contextMenu_comPortContainer.Name = "contextMenu_comPortContainer";
+            this.contextMenu_comPortContainer.LabelText = "COMポート:";
+            this.contextMenu_comPortContainer.SelectedIndexChanged += OnSettingChanged;
             //
-            // contextMenu_baudRate
+            // contextMenu_baudRateContainer
             //
-            this.contextMenu_baudRate.Name = "contextMenu_baudRate";
-            this.contextMenu_baudRate.Size = new Size(100, 38);
-            this.contextMenu_baudRate.Items.AddRange(new object[] { "9600", "19200", "38400", "115200" });
+            this.contextMenu_baudRateContainer.Name = "contextMenu_baudRateContainer";
+            this.contextMenu_baudRateContainer.LabelText = "ボーレート:";
+            this.contextMenu_baudRateContainer.AddItems(new object[] { "9600", "19200", "38400", "115200" });
+            this.contextMenu_baudRateContainer.SelectedIndexChanged += OnSettingChanged;
             // 
             // contextMenu_triggerSnap
             //
@@ -119,11 +127,12 @@ namespace triggerCam
             this.contextMenu_cameraSelect.Name = "contextMenu_cameraSelect";
             this.contextMenu_cameraSelect.Size = new Size(160, 38);
             //
-            // contextMenu_mode
+            // contextMenu_modeContainer
             //
-            this.contextMenu_mode.Name = "contextMenu_mode";
-            this.contextMenu_mode.Size = new Size(121, 38);
-            this.contextMenu_mode.Items.AddRange(new object[] { "静止画", "動画" });
+            this.contextMenu_modeContainer.Name = "contextMenu_modeContainer";
+            this.contextMenu_modeContainer.LabelText = "モード:";
+            this.contextMenu_modeContainer.AddItems(new object[] { "静止画", "動画" });
+            this.contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
             //
             // contextMenu_recordingsDirLabel
             //
@@ -152,21 +161,25 @@ namespace triggerCam
             this.contextMenu_address.AutoCompleteCustomSource.AddRange(new string[] { "127.0.0.1:10000" });
             this.contextMenu_address.Name = "contextMenu_address";
             this.contextMenu_address.Size = new Size(271, 35);
-            this.contextMenu_address.Text = "127.0.0.1:10000";            //
+            this.contextMenu_address.Text = "127.0.0.1:10000";
+            //
             // contextMenu_cameraSettingsSeparator
             //
             this.contextMenu_cameraSettingsSeparator.Name = "contextMenu_cameraSettingsSeparator";
-            this.contextMenu_cameraSettingsSeparator.Size = new Size(328, 6);            //
+            this.contextMenu_cameraSettingsSeparator.Size = new Size(328, 6);
+            //
             // contextMenu_imageFormatContainer
             //
+            this.contextMenu_imageFormatContainer.Name = "contextMenu_imageFormatContainer";
             this.contextMenu_imageFormatContainer.LabelText = "画像形式:";
-            this.contextMenu_imageFormatContainer.Items.AddRange(new object[] { "PNG", "JPG" });
+            this.contextMenu_imageFormatContainer.AddItems(new object[] { "PNG", "JPG" });
             this.contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
             //
             // contextMenu_codecContainer
             //
+            this.contextMenu_codecContainer.Name = "contextMenu_codecContainer";
             this.contextMenu_codecContainer.LabelText = "動画コーデック:";
-            this.contextMenu_codecContainer.Items.AddRange(new object[] { "H264", "MJPG", "WMV3" });
+            this.contextMenu_codecContainer.AddItems(new object[] { "H264", "MJPG", "WMV3" });
             this.contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
             //
             // contextMenu_recordingStatus
@@ -204,20 +217,22 @@ namespace triggerCam
         #endregion
 
         private ContextMenuStrip context;
-        private ToolStripComboBox contextMenu_comPort;
-        private ToolStripComboBox contextMenu_baudRate;
+        private HorizontalLayoutToolStripItem contextMenu_comPortContainer;
+        private HorizontalLayoutToolStripItem contextMenu_baudRateContainer;
         private ToolStripButton contextMenu_triggerSnap;
         private ToolStripButton contextMenu_triggerStart;
         private ToolStripButton contextMenu_triggerStop;
         private ToolStripComboBox contextMenu_cameraSelect;
-        private ToolStripComboBox contextMenu_mode;
+        private HorizontalLayoutToolStripItem contextMenu_modeContainer;
         private ToolStripMenuItem contextMenu_save;
         private ToolStripMenuItem contextMenu_exit;
-        private NotifyIcon notifyIcon1;        private ToolStripTextBox contextMenu_address;
+        private NotifyIcon notifyIcon1;
+        private ToolStripTextBox contextMenu_address;
         private ToolStripMenuItem contextMenu_recordingsDirLabel;
         private RecordingPathToolStripItem contextMenu_recordingsPath;
         private ToolStripMenuItem contextMenu_openRecordingsDir;        
-				private ToolStripSeparator contextMenu_cameraSettingsSeparator;        private ToolStripMenuItem contextMenu_recordingStatus;
+        private ToolStripSeparator contextMenu_cameraSettingsSeparator;
+        private ToolStripMenuItem contextMenu_recordingStatus;
         private HorizontalLayoutToolStripItem contextMenu_imageFormatContainer;
         private HorizontalLayoutToolStripItem contextMenu_codecContainer;
     }

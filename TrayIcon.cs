@@ -34,16 +34,15 @@ namespace triggerCam
             InitializeComponent();
             Initialize();
         }        private void Initialize()
-        {
-            uiContext = SynchronizationContext.Current;
+        {            uiContext = SynchronizationContext.Current;
             settings = AppSettings.Instance;
 
             context.Opened += ContextOpened;
             context.Closing += ContextClosing;
-            context.Closed += (s, e) => { isContextMenuOpen = false; };            contextMenu_comPort.SelectedIndexChanged += OnSettingChanged;
-            contextMenu_baudRate.SelectedIndexChanged += OnSettingChanged;
+            context.Closed += (s, e) => { isContextMenuOpen = false; };            contextMenu_comPortContainer.SelectedIndexChanged += OnSettingChanged;
+            contextMenu_baudRateContainer.SelectedIndexChanged += OnSettingChanged;
             contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
-            contextMenu_mode.SelectedIndexChanged += OnModeChanged;
+            contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
             contextMenu_address.TextChanged += OnAddressChanged;
             contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
             contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
@@ -57,10 +56,15 @@ namespace triggerCam
         {
             if (settings == null) return;
             
-            contextMenu_comPort.Items.Clear();
-            contextMenu_comPort.Items.AddRange(SerialPort.GetPortNames());
-            contextMenu_comPort.Text = settings.ComPort;
-            contextMenu_baudRate.Text = settings.BaudRate.ToString();
+            // COMポート設定
+            contextMenu_comPortContainer.ClearItems();
+            contextMenu_comPortContainer.AddItems(SerialPort.GetPortNames());
+            contextMenu_comPortContainer.ComboBoxText = settings.ComPort;
+            
+            // ボーレート設定
+            contextMenu_baudRateContainer.ClearItems();
+            contextMenu_baudRateContainer.AddItems(new object[] { "9600", "19200", "38400", "115200" });
+            contextMenu_baudRateContainer.ComboBoxText = settings.BaudRate.ToString();
             
             // カメラ選択の設定
             contextMenu_cameraSelect.Items.Clear();
@@ -86,7 +90,11 @@ namespace triggerCam
                 contextMenu_cameraSelect.SelectedIndex = 0;
             }
             
-            contextMenu_mode.SelectedIndex = 1; // デフォルトは動画モード
+            // モード設定
+            contextMenu_modeContainer.ClearItems();
+            contextMenu_modeContainer.AddItems(new object[] { "静止画", "動画" });
+            contextMenu_modeContainer.SelectedIndex = 1; // デフォルトは動画モード
+            
             contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
             contextMenu_address.Text = settings.UdpToAddress;
             
@@ -147,8 +155,8 @@ namespace triggerCam
         }        private void contextMenu_save_Click(object sender, EventArgs e)
         {
             if (settings == null) return;
-              settings.ComPort = contextMenu_comPort.Text;
-            if (int.TryParse(contextMenu_baudRate.Text, out int br))
+              settings.ComPort = contextMenu_comPortContainer.ComboBoxText;
+            if (int.TryParse(contextMenu_baudRateContainer.ComboBoxText, out int br))
                 settings.BaudRate = br;
                 
             // カメラインデックスを解析
@@ -180,7 +188,7 @@ namespace triggerCam
             settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
             settings.UdpToAddress = contextMenu_address.Text;
               // モードに応じた設定の保存
-            if (contextMenu_mode.SelectedIndex == 0) // 静止画モード
+            if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
             {
                 // 画像形式の保存
                 settings.ImageFormat = contextMenu_imageFormatContainer.ComboBoxText.ToLower();
@@ -299,14 +307,14 @@ namespace triggerCam
             UpdateButtonVisibility();
             
             // モード変更を通知
-            Console.WriteLine($"モード変更: {(contextMenu_mode.SelectedIndex == 0 ? "静止画" : "動画")}");
+            Console.WriteLine($"モード変更: {(contextMenu_modeContainer.SelectedIndex == 0 ? "静止画" : "動画")}");
         }        /// <summary>
         /// 選択されたモード（静止画/動画）に応じてUIの表示/非表示を切り替える
         /// </summary>
         private void UpdateButtonVisibility()
         {
             // モードインデックス: 0=静止画、1=動画
-            bool isImageMode = contextMenu_mode.SelectedIndex == 0;
+            bool isImageMode = contextMenu_modeContainer.SelectedIndex == 0;
               // ボタンの表示切替
             contextMenu_triggerSnap.Visible = isImageMode;
             contextMenu_triggerStart.Visible = !isImageMode;
@@ -451,7 +459,7 @@ namespace triggerCam
         /// <returns>選択されているモードのインデックス</returns>
         public int GetSelectedMode()
         {
-            return contextMenu_mode.SelectedIndex;
+            return contextMenu_modeContainer.SelectedIndex;
         }
 
         /// <summary>
@@ -465,9 +473,9 @@ namespace triggerCam
             // UIスレッドで実行
             uiContext.Post(_ => 
             {
-                if (modeIndex >= 0 && modeIndex < contextMenu_mode.Items.Count)
+                if (modeIndex >= 0 && modeIndex < contextMenu_modeContainer.Items.Count)
                 {
-                    contextMenu_mode.SelectedIndex = modeIndex;
+                    contextMenu_modeContainer.SelectedIndex = modeIndex;
                     // OnModeChangedイベントが自動的に呼ばれる
                 }
             }, null);
