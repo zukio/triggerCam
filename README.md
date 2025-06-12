@@ -225,7 +225,6 @@ WinFormsは、Windowsデスクトップアプリケーションを作成する�
 
    ```powershell
    # NuGet パッケージのインストール
-   Install-Package NAudio -Version 2.2.1
    Install-Package OpenCvSharp4 -Version 4.9.0
    Install-Package OpenCvSharp4.runtime.win -Version 4.9.0
    Install-Package System.IO.Ports -Version 8.0.0

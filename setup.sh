@@ -26,7 +26,6 @@ fi
 
 # NuGet dependencies
 declare -A packages=(
-  ["NAudio"]="2.2.1"
   ["OpenCvSharp4"]="4.9.0"
   ["OpenCvSharp4.runtime.win"]="4.9.0"
   ["System.IO.Ports"]="8.0.0"
