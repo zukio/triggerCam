@@ -102,8 +102,8 @@ namespace triggerCam
             }
             
             // モード設定
-            contextMenu_modeContainer.ClearItems();
-            contextMenu_modeContainer.AddItems(new object[] { "静止画", "動画" });
+            contextMenu_modeContainer.Items.Clear();
+            contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
             contextMenu_modeContainer.SelectedIndex = 1; // デフォルトは動画モード
             
             contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
