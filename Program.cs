@@ -20,7 +20,11 @@ namespace triggerCam
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                MessageBox.Show("Serial ports are only supported on Windows");
+                MessageBox.Show(
+                    "Serial features are only available on Windows.",
+                    "Platform Not Supported",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
             var settings = AppSettings.Instance;

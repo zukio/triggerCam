@@ -37,10 +37,13 @@ namespace triggerCam
             {
                 port.Open();
             }
-            catch (PlatformNotSupportedException ex)
+            catch (PlatformNotSupportedException)
             {
-                LogWriter.AddErrorLog(ex, nameof(Start));
-                MessageBox.Show("Serial port is not supported on this platform.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Serial ports are not supported on this platform.",
+                    "Platform Not Supported",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
