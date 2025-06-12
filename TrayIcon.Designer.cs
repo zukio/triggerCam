@@ -30,197 +30,200 @@ namespace triggerCam
         /// コード エディターで変更しないでください。
         /// </summary>
         private void InitializeComponent()
-        {
-            components = new System.ComponentModel.Container();
+        {            
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrayIcon));
-            context = new ContextMenuStrip(components);
-            contextMenu_comPort = new ToolStripComboBox();
-            contextMenu_baudRate = new ToolStripComboBox();
-            contextMenu_triggerSnap = new ToolStripTextBox();
-            contextMenu_triggerStart = new ToolStripTextBox();
-            contextMenu_triggerStop = new ToolStripTextBox();
-            contextMenu_cameraSelect = new ToolStripComboBox();
-            contextMenu_mode = new ToolStripComboBox();
-            contextMenu_recordingsDirLabel = new ToolStripMenuItem();
-            contextMenu_recordingsPath = new RecordingPathToolStripItem();
-            contextMenu_openRecordingsDir = new ToolStripMenuItem();
-            contextMenu_address = new ToolStripTextBox();
-            contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
-            contextMenu_cameraSettings = new ToolStripMenuItem();
-            contextMenu_resolution = new ToolStripComboBox();
-            contextMenu_frameRate = new ToolStripComboBox();
-            contextMenu_imageFormat = new ToolStripComboBox();
-            contextMenu_recordingStatus = new ToolStripMenuItem();
-            contextMenu_save = new ToolStripMenuItem();
-            contextMenu_exit = new ToolStripMenuItem();
-            notifyIcon1 = new NotifyIcon(components);
-            context.SuspendLayout();
+            this.context = new ContextMenuStrip(this.components);
+            this.contextMenu_comPort = new ToolStripComboBox();
+            this.contextMenu_baudRate = new ToolStripComboBox();
+            this.contextMenu_triggerSnap = new ToolStripButton();
+            this.contextMenu_triggerStart = new ToolStripButton();
+            this.contextMenu_triggerStop = new ToolStripButton();
+            this.contextMenu_cameraSelect = new ToolStripComboBox();
+            this.contextMenu_mode = new ToolStripComboBox();            this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
+            this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
+            this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
+            this.contextMenu_address = new ToolStripTextBox();            
+            this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
+            this.contextMenu_imageFormatLabel = new ToolStripMenuItem();
+            this.contextMenu_imageFormat = new ToolStripComboBox();
+            this.contextMenu_codecLabel = new ToolStripMenuItem();
+            this.contextMenu_codec = new ToolStripComboBox();
+            this.contextMenu_recordingStatus = new ToolStripMenuItem();
+            this.contextMenu_save = new ToolStripMenuItem();
+            this.contextMenu_exit = new ToolStripMenuItem();
+            this.notifyIcon1 = new NotifyIcon(this.components);
+            this.context.SuspendLayout();
             // 
             // context
             // 
-            context.AccessibleRole = AccessibleRole.Cursor;
-            context.BackColor = SystemColors.Window;
-            context.ImageScalingSize = new Size(28, 28);
-            context.Items.AddRange(new ToolStripItem[] {
-                                                        contextMenu_comPort,
-                                                        contextMenu_baudRate,
-                                                        contextMenu_triggerSnap,
-                                                        contextMenu_triggerStart,
-                                                        contextMenu_triggerStop,
-                                                        contextMenu_cameraSelect,
-                                                        contextMenu_mode,
-                                                        contextMenu_recordingsDirLabel,
-                                                        contextMenu_recordingsPath,
-                                                        contextMenu_openRecordingsDir,
-                                                        contextMenu_address,
-                                                        contextMenu_cameraSettingsSeparator,
-                                                        contextMenu_cameraSettings,
-                                                        contextMenu_resolution,
-                                                        contextMenu_frameRate,
-                                                        contextMenu_imageFormat,
-                                                        contextMenu_recordingStatus,
-                                                        contextMenu_save,
-                                                        contextMenu_exit
+            this.context.AccessibleRole = AccessibleRole.Cursor;
+            this.context.BackColor = SystemColors.Window;
+            this.context.ImageScalingSize = new Size(28, 28);              this.context.Items.AddRange(new ToolStripItem[] {
+                                                        this.contextMenu_comPort,
+                                                        this.contextMenu_baudRate,
+                                                        this.contextMenu_triggerSnap,
+                                                        this.contextMenu_triggerStart,
+                                                        this.contextMenu_triggerStop,
+                                                        this.contextMenu_cameraSelect,
+                                                        this.contextMenu_mode,
+                                                        this.contextMenu_recordingsDirLabel,
+                                                        this.contextMenu_recordingsPath,
+                                                        this.contextMenu_openRecordingsDir,                                                        this.contextMenu_address,
+                                                        this.contextMenu_cameraSettingsSeparator,
+                                                        this.contextMenu_imageFormatLabel,
+                                                        this.contextMenu_imageFormat,
+                                                        this.contextMenu_codecLabel,
+                                                        this.contextMenu_codec,
+                                                        this.contextMenu_recordingStatus,
+                                                        this.contextMenu_save,
+                                                        this.contextMenu_exit
                                                 });
-            context.Name = "context";
-            context.Size = new Size(332, 158);
+            this.context.Name = "context";
+            this.context.Size = new Size(332, 158);
             // 
             // contextMenu_comPort
             //
-            contextMenu_comPort.Name = "contextMenu_comPort";
-            contextMenu_comPort.Size = new Size(160, 38);
-            contextMenu_comPort.Text = "COM";
+            this.contextMenu_comPort.Name = "contextMenu_comPort";
+            this.contextMenu_comPort.Size = new Size(160, 38);
+            this.contextMenu_comPort.Text = "COM";
             //
             // contextMenu_baudRate
             //
-            contextMenu_baudRate.Name = "contextMenu_baudRate";
-            contextMenu_baudRate.Size = new Size(100, 38);
-            contextMenu_baudRate.Items.AddRange(new object[] { "9600", "19200", "38400", "115200" });
-            //
+            this.contextMenu_baudRate.Name = "contextMenu_baudRate";
+            this.contextMenu_baudRate.Size = new Size(100, 38);
+            this.contextMenu_baudRate.Items.AddRange(new object[] { "9600", "19200", "38400", "115200" });
+            // 
             // contextMenu_triggerSnap
             //
-            contextMenu_triggerSnap.Name = "contextMenu_triggerSnap";
-            contextMenu_triggerSnap.Size = new Size(160, 34);
-            contextMenu_triggerSnap.Text = "SNAP";
+            this.contextMenu_triggerSnap.Name = "contextMenu_triggerSnap";
+            this.contextMenu_triggerSnap.Size = new Size(160, 34);
+            this.contextMenu_triggerSnap.Text = "静止画撮影";
+            this.contextMenu_triggerSnap.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            this.contextMenu_triggerSnap.BackColor = System.Drawing.Color.LightBlue;
+            this.contextMenu_triggerSnap.Click += contextMenu_triggerSnap_Click;
             //
             // contextMenu_triggerStart
             //
-            contextMenu_triggerStart.Name = "contextMenu_triggerStart";
-            contextMenu_triggerStart.Size = new Size(160, 34);
-            contextMenu_triggerStart.Text = "START";
+            this.contextMenu_triggerStart.Name = "contextMenu_triggerStart";
+            this.contextMenu_triggerStart.Size = new Size(160, 34);
+            this.contextMenu_triggerStart.Text = "録画開始";
+            this.contextMenu_triggerStart.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            this.contextMenu_triggerStart.BackColor = System.Drawing.Color.LightGreen;
+            this.contextMenu_triggerStart.Click += contextMenu_triggerStart_Click;
             //
             // contextMenu_triggerStop
             //
-            contextMenu_triggerStop.Name = "contextMenu_triggerStop";
-            contextMenu_triggerStop.Size = new Size(160, 34);
-            contextMenu_triggerStop.Text = "STOP";
+            this.contextMenu_triggerStop.Name = "contextMenu_triggerStop";
+            this.contextMenu_triggerStop.Size = new Size(160, 34);
+            this.contextMenu_triggerStop.Text = "録画停止";
+            this.contextMenu_triggerStop.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            this.contextMenu_triggerStop.BackColor = System.Drawing.Color.IndianRed;
+            this.contextMenu_triggerStop.Click += contextMenu_triggerStop_Click;
             //
             // contextMenu_cameraSelect
             //
-            contextMenu_cameraSelect.Name = "contextMenu_cameraSelect";
-            contextMenu_cameraSelect.Size = new Size(160, 38);
+            this.contextMenu_cameraSelect.Name = "contextMenu_cameraSelect";
+            this.contextMenu_cameraSelect.Size = new Size(160, 38);
             //
             // contextMenu_mode
             //
-            contextMenu_mode.Name = "contextMenu_mode";
-            contextMenu_mode.Size = new Size(121, 38);
-            contextMenu_mode.Items.AddRange(new object[] { "静止画", "動画" });
+            this.contextMenu_mode.Name = "contextMenu_mode";
+            this.contextMenu_mode.Size = new Size(121, 38);
+            this.contextMenu_mode.Items.AddRange(new object[] { "静止画", "動画" });
             //
             // contextMenu_recordingsDirLabel
             //
-            contextMenu_recordingsDirLabel.Name = "contextMenu_recordingsDirLabel";
-            contextMenu_recordingsDirLabel.Size = new Size(331, 36);
-            contextMenu_recordingsDirLabel.Text = "撮影データの保存場所:";
-            contextMenu_recordingsDirLabel.Enabled = false;
+            this.contextMenu_recordingsDirLabel.Name = "contextMenu_recordingsDirLabel";
+            this.contextMenu_recordingsDirLabel.Size = new Size(331, 36);
+            this.contextMenu_recordingsDirLabel.Text = "撮影データの保存場所:";
+            this.contextMenu_recordingsDirLabel.Enabled = false;
             // 
             // contextMenu_recordingsPath
             // 
-            contextMenu_recordingsPath.Name = "contextMenu_recordingsPath";
-            contextMenu_recordingsPath.Size = new Size(271, 35);
-            contextMenu_recordingsPath.Path = "Recordings";
-            contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
-            contextMenu_recordingsPath.BrowseClicked += contextMenu_browseRecordingsDir_Click;
+            this.contextMenu_recordingsPath.Name = "contextMenu_recordingsPath";
+            this.contextMenu_recordingsPath.Size = new Size(271, 35);
+            this.contextMenu_recordingsPath.Path = "Recordings";
+            this.contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
+            this.contextMenu_recordingsPath.BrowseClicked += contextMenu_browseRecordingsDir_Click;
             // 
             // contextMenu_openRecordingsDir
             // 
-            contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
-            contextMenu_openRecordingsDir.Size = new Size(331, 36);
-            contextMenu_openRecordingsDir.Text = "撮影データを開く";
-            contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
+            this.contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
+            this.contextMenu_openRecordingsDir.Size = new Size(331, 36);
+            this.contextMenu_openRecordingsDir.Text = "撮影データを開く";
+            this.contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
             // 
             // contextMenu_address
             // 
-            contextMenu_address.AutoCompleteCustomSource.AddRange(new string[] { "127.0.0.1:10000" });
-            contextMenu_address.Name = "contextMenu_address";
-            contextMenu_address.Size = new Size(271, 35);
-            contextMenu_address.Text = "127.0.0.1:10000";
-            //
+            this.contextMenu_address.AutoCompleteCustomSource.AddRange(new string[] { "127.0.0.1:10000" });
+            this.contextMenu_address.Name = "contextMenu_address";
+            this.contextMenu_address.Size = new Size(271, 35);
+            this.contextMenu_address.Text = "127.0.0.1:10000";            //
             // contextMenu_cameraSettingsSeparator
             //
-            contextMenu_cameraSettingsSeparator.Name = "contextMenu_cameraSettingsSeparator";
-            contextMenu_cameraSettingsSeparator.Size = new Size(328, 6);
-            //
-            // contextMenu_cameraSettings
-            //
-            contextMenu_cameraSettings.Name = "contextMenu_cameraSettings";
-            contextMenu_cameraSettings.Size = new Size(331, 36);
-            contextMenu_cameraSettings.Text = "カメラ設定:";
-            contextMenu_cameraSettings.Enabled = false;
-            //
-            // contextMenu_resolution
-            //
-            contextMenu_resolution.Name = "contextMenu_resolution";
-            contextMenu_resolution.Size = new Size(180, 38);
-            contextMenu_resolution.Text = "解像度";
-            contextMenu_resolution.Items.AddRange(new object[] { "640x480", "1280x720", "1920x1080" });
-            contextMenu_resolution.SelectedIndexChanged += OnSettingChanged;
-            //
-            // contextMenu_frameRate
-            //
-            contextMenu_frameRate.Name = "contextMenu_frameRate";
-            contextMenu_frameRate.Size = new Size(100, 38);
-            contextMenu_frameRate.Text = "FPS";
-            contextMenu_frameRate.Items.AddRange(new object[] { "15", "24", "30", "60" });
-            contextMenu_frameRate.SelectedIndexChanged += OnSettingChanged;
+            this.contextMenu_cameraSettingsSeparator.Name = "contextMenu_cameraSettingsSeparator";
+            this.contextMenu_cameraSettingsSeparator.Size = new Size(328, 6);
             //
             // contextMenu_imageFormat
             //
-            contextMenu_imageFormat.Name = "contextMenu_imageFormat";
-            contextMenu_imageFormat.Size = new Size(100, 38);
-            contextMenu_imageFormat.Text = "画像形式";
-            contextMenu_imageFormat.Items.AddRange(new object[] { "PNG", "JPG" });
-            contextMenu_imageFormat.SelectedIndexChanged += OnSettingChanged;
+            this.contextMenu_imageFormat.Name = "contextMenu_imageFormat";
+            this.contextMenu_imageFormat.Size = new Size(100, 38);
+            this.contextMenu_imageFormat.Text = "画像形式";
+            this.contextMenu_imageFormat.Items.AddRange(new object[] { "PNG", "JPG" });
+            this.contextMenu_imageFormat.SelectedIndexChanged += OnSettingChanged;            //
+            // contextMenu_imageFormatLabel
+            //
+            this.contextMenu_imageFormatLabel.Name = "contextMenu_imageFormatLabel";
+            this.contextMenu_imageFormatLabel.Size = new Size(331, 36);
+            this.contextMenu_imageFormatLabel.Text = "画像形式:";
+            this.contextMenu_imageFormatLabel.Enabled = false;
+            //
+            // contextMenu_codecLabel
+            //
+            this.contextMenu_codecLabel.Name = "contextMenu_codecLabel";
+            this.contextMenu_codecLabel.Size = new Size(331, 36);
+            this.contextMenu_codecLabel.Text = "動画コーデック:";
+            this.contextMenu_codecLabel.Enabled = false;
+            //
+            // contextMenu_codec
+            //
+            this.contextMenu_codec.Name = "contextMenu_codec";
+            this.contextMenu_codec.Size = new Size(100, 38);
+            this.contextMenu_codec.Text = "コーデック";
+            this.contextMenu_codec.Items.AddRange(new object[] { "H264", "MJPG", "WMV3" });
+            this.contextMenu_codec.SelectedIndexChanged += OnSettingChanged;
             //
             // contextMenu_recordingStatus
             //
-            contextMenu_recordingStatus.Name = "contextMenu_recordingStatus";
-            contextMenu_recordingStatus.Size = new Size(331, 36);
-            contextMenu_recordingStatus.Text = "録画状態: 停止中";
-            contextMenu_recordingStatus.Enabled = false;
+            this.contextMenu_recordingStatus.Name = "contextMenu_recordingStatus";
+            this.contextMenu_recordingStatus.Size = new Size(331, 36);
+            this.contextMenu_recordingStatus.Text = "録画状態: 停止中";
+            this.contextMenu_recordingStatus.Enabled = false;
             // 
             // contextMenu_save
             // 
-            contextMenu_save.Enabled = false;
-            contextMenu_save.Name = "contextMenu_save";
-            contextMenu_save.Size = new Size(331, 36);
-            contextMenu_save.Text = "保存";
-            contextMenu_save.Click += contextMenu_save_Click;
+            this.contextMenu_save.Enabled = false;
+            this.contextMenu_save.Name = "contextMenu_save";
+            this.contextMenu_save.Size = new Size(331, 36);
+            this.contextMenu_save.Text = "保存";
+            this.contextMenu_save.Click += contextMenu_save_Click;
             // 
             // contextMenu_exit
             // 
-            contextMenu_exit.Name = "contextMenu_exit";
-            contextMenu_exit.Size = new Size(331, 36);
-            contextMenu_exit.Text = "Exit";
-            contextMenu_exit.Click += contextMenu_exit_Click;
+            this.contextMenu_exit.Name = "contextMenu_exit";
+            this.contextMenu_exit.Size = new Size(331, 36);
+            this.contextMenu_exit.Text = "Exit";
+            this.contextMenu_exit.Click += contextMenu_exit_Click;
             // 
             // notifyIcon1
             // 
-            notifyIcon1.ContextMenuStrip = context;
-            notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
-            notifyIcon1.Text = "Camera Recorder";
-            notifyIcon1.Visible = true;
-            notifyIcon1.MouseClick += trayIcon_MouseClick;
-            context.ResumeLayout(false);
+            this.notifyIcon1.ContextMenuStrip = this.context;
+            this.notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
+            this.notifyIcon1.Text = "Camera Recorder";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseClick += trayIcon_MouseClick;
+            this.context.ResumeLayout(false);
         }
 
         #endregion
@@ -228,23 +231,23 @@ namespace triggerCam
         private ContextMenuStrip context;
         private ToolStripComboBox contextMenu_comPort;
         private ToolStripComboBox contextMenu_baudRate;
-        private ToolStripTextBox contextMenu_triggerSnap;
-        private ToolStripTextBox contextMenu_triggerStart;
-        private ToolStripTextBox contextMenu_triggerStop;
+        private ToolStripButton contextMenu_triggerSnap;
+        private ToolStripButton contextMenu_triggerStart;
+        private ToolStripButton contextMenu_triggerStop;
         private ToolStripComboBox contextMenu_cameraSelect;
         private ToolStripComboBox contextMenu_mode;
         private ToolStripMenuItem contextMenu_save;
         private ToolStripMenuItem contextMenu_exit;
         private NotifyIcon notifyIcon1;
-        private ToolStripTextBox contextMenu_address;
+				private ToolStripTextBox contextMenu_address;
         private ToolStripMenuItem contextMenu_recordingsDirLabel;
         private RecordingPathToolStripItem contextMenu_recordingsPath;
-        private ToolStripMenuItem contextMenu_openRecordingsDir;
-        private ToolStripSeparator contextMenu_cameraSettingsSeparator;
-        private ToolStripMenuItem contextMenu_cameraSettings;
-        private ToolStripComboBox contextMenu_resolution;
-        private ToolStripComboBox contextMenu_frameRate;
+        private ToolStripMenuItem contextMenu_openRecordingsDir;        
+				private ToolStripSeparator contextMenu_cameraSettingsSeparator;
         private ToolStripComboBox contextMenu_imageFormat;
         private ToolStripMenuItem contextMenu_recordingStatus;
+        private ToolStripMenuItem contextMenu_imageFormatLabel;
+        private ToolStripComboBox contextMenu_codec;
+        private ToolStripMenuItem contextMenu_codecLabel;
     }
 }

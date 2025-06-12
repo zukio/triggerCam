@@ -1,5 +1,6 @@
 using OpenCvSharp;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using triggerCam.Settings;
@@ -17,12 +18,12 @@ namespace triggerCam.Camera
         private bool isRecording = false;
         private readonly int cameraIndex;
         private readonly string saveDirectory;
-        private readonly int fps;
-        private readonly int width;
-        private readonly int height;
-        private readonly string videoCodec;
-        private readonly int imageQuality;
-        private readonly string imageFormat;
+        private int fps;
+        private int width;
+        private int height;
+        private string videoCodec;
+        private int imageQuality;
+        private string imageFormat;
 
         public event Action<string>? SnapshotSaved;
         public event Action<string>? VideoSaved;
@@ -151,6 +152,49 @@ namespace triggerCam.Camera
                 // カメラの解像度を設定
                 capture.Set(VideoCaptureProperties.FrameWidth, width);
                 capture.Set(VideoCaptureProperties.FrameHeight, height);
+                
+                // 設定後に実際の値を取得
+                width = (int)capture.Get(VideoCaptureProperties.FrameWidth);
+                height = (int)capture.Get(VideoCaptureProperties.FrameHeight);
+                fps = (int)capture.Get(VideoCaptureProperties.Fps);
+                
+                // AppSettingsも更新して次回起動時に正確な値を使用できるようにする
+                UpdateAppSettings();
+                
+                Console.WriteLine($"カメラの実際の設定値: 解像度={width}x{height}, FPS={fps}");
+            }
+        }
+
+        /// <summary>
+        /// AppSettingsをカメラの実際の値で更新する
+        /// </summary>
+        private void UpdateAppSettings()
+        {
+            var settings = AppSettings.Instance;
+            bool changed = false;
+            
+            if (settings.VideoWidth != width)
+            {
+                settings.VideoWidth = width;
+                changed = true;
+            }
+            
+            if (settings.VideoHeight != height)
+            {
+                settings.VideoHeight = height;
+                changed = true;
+            }
+            
+            if (settings.FrameRate != fps)
+            {
+                settings.FrameRate = fps;
+                changed = true;
+            }
+            
+            // 変更があった場合のみ保存する
+            if (changed)
+            {
+                settings.Save();
             }
         }
         
@@ -166,6 +210,151 @@ namespace triggerCam.Camera
                 case "DIVX": return FourCC.DIVX;
                 case "X264": return FourCC.X264;
                 default: return FourCC.H264;
+            }
+        }        /// <summary>
+        /// カメラの解像度を設定 (現在は無効化されており、実際の値が自動取得されます)
+        /// </summary>
+        /// <param name="width">幅</param>
+        /// <param name="height">高さ</param>
+        public void SetResolution(int width, int height)
+        {
+            Console.WriteLine($"警告: 解像度設定は無効化されています。カメラから実際の値を自動取得します。");
+            
+            // すでにカメラがオープンされている場合は実際の値を取得
+            if (capture != null && capture.IsOpened())
+            {
+                // 実際の値を取得
+                this.width = (int)capture.Get(VideoCaptureProperties.FrameWidth);
+                this.height = (int)capture.Get(VideoCaptureProperties.FrameHeight);
+                
+                // AppSettingsも更新
+                UpdateAppSettings();
+                
+                Console.WriteLine($"カメラの実際の解像度: {this.width}x{this.height}");
+            }
+        }
+        
+        /// <summary>
+        /// フレームレートを設定 (現在は無効化されており、実際の値が自動取得されます)
+        /// </summary>
+        /// <param name="frameRate">フレームレート</param>
+        public void SetFrameRate(int frameRate)
+        {
+            Console.WriteLine($"警告: フレームレート設定は無効化されています。カメラから実際の値を自動取得します。");
+            
+            // すでにカメラがオープンされている場合は実際の値を取得
+            if (capture != null && capture.IsOpened())
+            {
+                // 実際の値を取得
+                this.fps = (int)capture.Get(VideoCaptureProperties.Fps);
+                
+                // AppSettingsも更新
+                UpdateAppSettings();
+                
+                Console.WriteLine($"カメラの実際のフレームレート: {this.fps}");
+            }
+        }
+        
+        /// <summary>
+        /// ビデオコーデックを設定
+        /// </summary>
+        /// <param name="codec">コーデック（H264, MJPG, DIVX, X264など）</param>
+        public void SetVideoCodec(string codec)
+        {
+            if (!string.IsNullOrEmpty(codec))
+            {
+                this.videoCodec = codec;
+            }
+        }
+        
+        /// <summary>
+        /// 画像品質を設定
+        /// </summary>
+        /// <param name="quality">品質（1-100）</param>
+        public void SetImageQuality(int quality)
+        {
+            if (quality >= 1 && quality <= 100)
+            {
+                this.imageQuality = quality;
+            }
+        }
+        
+        /// <summary>
+        /// 画像フォーマットを設定
+        /// </summary>
+        /// <param name="format">フォーマット（png, jpg, jpegなど）</param>
+        public void SetImageFormat(string format)
+        {
+            if (!string.IsNullOrEmpty(format))
+            {
+                this.imageFormat = format.ToLower();
+            }
+        }
+        
+        /// <summary>
+        /// 現在の設定をDictionaryとして取得
+        /// </summary>
+        /// <returns>設定を含むDictionary</returns>
+        public Dictionary<string, object> GetSettings()
+        {
+            // カメラがまだ初期化されていない場合は初期化
+            if (capture == null || !capture.IsOpened())
+            {
+                try {
+                    EnsureCapture();
+                } catch {
+                    // カメラが利用できない場合は保存されている値を返す
+                }
+            }
+            
+            // カメラが利用可能な場合は実際の値を取得
+            if (capture != null && capture.IsOpened())
+            {
+                width = (int)capture.Get(VideoCaptureProperties.FrameWidth);
+                height = (int)capture.Get(VideoCaptureProperties.FrameHeight);
+                fps = (int)capture.Get(VideoCaptureProperties.Fps);
+                
+                // AppSettingsも更新
+                UpdateAppSettings();
+            }
+            
+            return new Dictionary<string, object>
+            {
+                { "resolution", $"{width}x{height}" },
+                { "frameRate", fps },
+                { "videoCodec", videoCodec },
+                { "imageQuality", imageQuality },
+                { "imageFormat", imageFormat }
+            };
+        }
+
+        /// <summary>
+        /// カメラをセットアップし、実際の解像度とフレームレートを表示
+        /// </summary>
+        public void SetupCamera()
+        {
+            try
+            {
+                // カメラを初期化して実際の値を取得
+                EnsureCapture();
+                
+                // 実際の値をコンソールに表示
+                Console.WriteLine($"カメラの実際の設定: 解像度={width}x{height}, FPS={fps}");
+                
+                // イベントリスナーをアタッチしていない場合は追加
+                if (SnapshotSaved == null)
+                {
+                    SnapshotSaved += (path) => Console.WriteLine($"静止画を保存しました: {path}");
+                }
+                
+                if (VideoSaved == null)
+                {
+                    VideoSaved += (path) => Console.WriteLine($"録画を保存しました: {path}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"カメラのセットアップに失敗しました: {ex.Message}");
             }
         }
 

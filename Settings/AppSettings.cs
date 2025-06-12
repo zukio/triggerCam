@@ -52,17 +52,17 @@ namespace triggerCam.Settings
         
         // カメラ設定
         /// <summary>
-        /// 録画の解像度 - 幅
+        /// 録画の解像度 - 幅（カメラから自動的に取得される実際の値）
         /// </summary>
         public int VideoWidth { get; set; } = 1280;
         
         /// <summary>
-        /// 録画の解像度 - 高さ
+        /// 録画の解像度 - 高さ（カメラから自動的に取得される実際の値）
         /// </summary>
         public int VideoHeight { get; set; } = 720;
         
         /// <summary>
-        /// 録画のフレームレート
+        /// 録画のフレームレート（カメラから自動的に取得される実際の値）
         /// </summary>
         public int FrameRate { get; set; } = 30;
         
