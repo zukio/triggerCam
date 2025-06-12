@@ -27,7 +27,6 @@ namespace triggerCam
                     MessageBoxIcon.Information);
                 return;
             }
-
             var settings = AppSettings.Instance;
             ParseUdpAddress(settings.UdpToAddress, out udpToIP, out udpToPort);
             udpClient = new UdpClient();
