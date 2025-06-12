@@ -26,12 +26,10 @@ namespace micNotifyUDP.Settings
 
         // 設定項目
         public string UdpToAddress { get; set; } = "127.0.0.1:10000";
-        public string UdpListenAddress { get; set; } = "127.0.0.1:10001";
-        public int SilenceThreshold { get; set; } = 150;
-        public int MinAudioSamples { get; set; } = 10;
-        public string DeviceName { get; set; } = "";
-        public string RecordingsDirectory { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Recordings");
-				public bool UseTempFile { get; set; } = true;
+        public string ComPort { get; set; } = "COM1";
+        public int BaudRate { get; set; } = 9600;
+        public int CameraIndex { get; set; } = 0;
+        public string CameraSaveDirectory { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Videos");
         // コンストラクタ
         private AppSettings() { }
 
