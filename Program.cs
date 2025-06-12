@@ -1,6 +1,7 @@
 using System;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 using triggerCam.Camera;
 using triggerCam.Settings;
 
@@ -17,6 +18,11 @@ namespace triggerCam
         [STAThread]
         static void Main()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                MessageBox.Show("Serial ports are only supported on Windows");
+                return;
+            }
             var settings = AppSettings.Instance;
             ParseUdpAddress(settings.UdpToAddress, out udpToIP, out udpToPort);
             udpClient = new UdpClient();

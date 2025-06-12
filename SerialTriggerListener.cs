@@ -1,6 +1,7 @@
 using System;
 using System.IO.Ports;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace triggerCam
 {
@@ -32,7 +33,15 @@ namespace triggerCam
         public void Start()
         {
             port.DataReceived += OnDataReceived;
-            port.Open();
+            try
+            {
+                port.Open();
+            }
+            catch (PlatformNotSupportedException ex)
+            {
+                LogWriter.AddErrorLog(ex, nameof(Start));
+                MessageBox.Show("Serial port is not supported on this platform.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
