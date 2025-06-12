@@ -37,7 +37,6 @@ namespace triggerCam
             this.context = new ContextMenuStrip(this.components);
             this.contextMenu_serialContainer = new HorizontalMultiControlToolStripItem();
             this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
-            this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("", 100, false);
             this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
             this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
             this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
@@ -59,7 +58,6 @@ namespace triggerCam
             this.context.Items.AddRange(new ToolStripItem[] {
                                                         this.contextMenu_serialContainer,
                                                         this.contextMenu_cameraControlsContainer,
-                                                        this.contextMenu_modeContainer,
                                                         this.contextMenu_recordingsDirLabel,
                                                         this.contextMenu_recordingsPath,
                                                         this.contextMenu_openRecordingsDir,
@@ -112,10 +110,11 @@ namespace triggerCam
             this.contextMenu_triggerStart.Visible = true;
             this.contextMenu_triggerStop.Visible = false;
             //
-            // contextMenu_modeContainer
+            // contextMenu_modeContainer (ComboBox)
             //
+            this.contextMenu_modeContainer = this.contextMenu_cameraControlsContainer.AddComboBox(100);
             this.contextMenu_modeContainer.Name = "contextMenu_modeContainer";
-            this.contextMenu_modeContainer.AddItems(new object[] { "静止画", "動画" });
+            this.contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
             this.contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
             //
             // contextMenu_recordingsDirLabel
@@ -209,7 +208,7 @@ namespace triggerCam
         private Button contextMenu_triggerStart;
         private Button contextMenu_triggerStop;
         private ComboBox contextMenu_cameraSelect;
-        private HorizontalLayoutToolStripItem contextMenu_modeContainer;
+        private ComboBox contextMenu_modeContainer;
         private ToolStripMenuItem contextMenu_save;
         private ToolStripMenuItem contextMenu_exit;
         private NotifyIcon notifyIcon1;
