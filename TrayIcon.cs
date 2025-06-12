@@ -39,8 +39,9 @@ namespace triggerCam
 
             context.Opened += ContextOpened;
             context.Closing += ContextClosing;
-            context.Closed += (s, e) => { isContextMenuOpen = false; };            contextMenu_comPortContainer.SelectedIndexChanged += OnSettingChanged;
-            contextMenu_baudRateContainer.SelectedIndexChanged += OnSettingChanged;
+            context.Closed += (s, e) => { isContextMenuOpen = false; };            
+            contextMenu_comPortSelect.SelectedIndexChanged += OnSettingChanged;
+            contextMenu_baudRateSelect.SelectedIndexChanged += OnSettingChanged;
             contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
             contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
             contextMenu_address.TextChanged += OnAddressChanged;
@@ -55,15 +56,26 @@ namespace triggerCam
         }        private void LoadSettings()
         {
             if (settings == null) return;
-              // COMポート設定
-            contextMenu_comPortContainer.ClearItems();
-            contextMenu_comPortContainer.AddItems(SerialPort.GetPortNames());
-            contextMenu_comPortContainer.ComboBoxText = settings.ComPort;
+              // COMポート設定contextMenu_comPortSelect.Items.Clear();
+            var ports = SerialPort.GetPortNames();
+            if (ports.Length > 0)
+            {
+                contextMenu_comPortSelect.Items.AddRange(ports);
+                if (ports.Contains(settings.ComPort))
+                    contextMenu_comPortSelect.SelectedItem = settings.ComPort;
+                else
+                    contextMenu_comPortSelect.SelectedIndex = 0;
+            }
+            else
+            {
+                contextMenu_comPortSelect.Items.Add("シリアルポート");
+                contextMenu_comPortSelect.SelectedIndex = 0;
+            }
             
             // ボーレート設定
-            contextMenu_baudRateContainer.ClearItems();
-            contextMenu_baudRateContainer.AddItems(new object[] { "9600", "19200", "38400", "115200" });
-            contextMenu_baudRateContainer.ComboBoxText = settings.BaudRate.ToString();
+            contextMenu_baudRateSelect.Items.Clear();
+            contextMenu_baudRateSelect.Items.AddRange(new object[] { "9600", "19200", "38400", "115200" });
+            contextMenu_baudRateSelect.Text = settings.BaudRate.ToString();
             
             // カメラ選択の設定
             contextMenu_cameraSelect.Items.Clear();
@@ -154,8 +166,9 @@ namespace triggerCam
         }        private void contextMenu_save_Click(object sender, EventArgs e)
         {
             if (settings == null) return;
-              settings.ComPort = contextMenu_comPortContainer.ComboBoxText;
-            if (int.TryParse(contextMenu_baudRateContainer.ComboBoxText, out int br))
+            string selectedPort = contextMenu_comPortSelect.SelectedItem as string ?? "";
+            settings.ComPort = selectedPort == "シリアルポート" ? string.Empty : selectedPort;
+            if (int.TryParse(contextMenu_baudRateSelect.Text, out int br))
                 settings.BaudRate = br;
                 
             // カメラインデックスを解析

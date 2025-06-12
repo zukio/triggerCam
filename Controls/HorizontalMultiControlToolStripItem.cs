@@ -63,6 +63,26 @@ namespace triggerCam.Controls
         }
 
         /// <summary>
+        /// ラベルを追加します
+        /// </summary>
+        /// <param name="text">ラベルのテキスト</param>
+        /// <returns>追加されたLabel</returns>
+        public Label AddLabel(string text)
+        {
+            var label = new Label
+            {
+                Text = text,
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleRight,
+                Margin = new Padding(3, 3, 3, 3)
+            };
+
+            _flowPanel.Controls.Add(label);
+            _controls.Add(label);
+            return label;
+        }
+
+        /// <summary>
         /// ボタンを追加します
         /// </summary>
         /// <param name="text">ボタンのテキスト</param>
