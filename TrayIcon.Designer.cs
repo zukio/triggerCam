@@ -37,7 +37,7 @@ namespace triggerCam
             this.context = new ContextMenuStrip(this.components);
             this.contextMenu_serialContainer = new HorizontalMultiControlToolStripItem();
             this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
-            this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("モード:", 100);
+            this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("", 100, false);
             this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
             this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
             this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
@@ -78,7 +78,6 @@ namespace triggerCam
             // contextMenu_serialContainer
             //
             this.contextMenu_serialContainer.Name = "contextMenu_serialContainer";
-            var labelCom = this.contextMenu_serialContainer.AddLabel("シリアルポート:");
             this.contextMenu_comPortSelect = this.contextMenu_serialContainer.AddComboBox(120);
             this.contextMenu_comPortSelect.Name = "contextMenu_comPortSelect";
             this.contextMenu_comPortSelect.SelectedIndexChanged += OnSettingChanged;
@@ -116,7 +115,6 @@ namespace triggerCam
             // contextMenu_modeContainer
             //
             this.contextMenu_modeContainer.Name = "contextMenu_modeContainer";
-            this.contextMenu_modeContainer.LabelText = "モード:";
             this.contextMenu_modeContainer.AddItems(new object[] { "静止画", "動画" });
             this.contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
             //
