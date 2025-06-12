@@ -30,6 +30,38 @@ namespace micNotifyUDP.Settings
         public int BaudRate { get; set; } = 9600;
         public int CameraIndex { get; set; } = 0;
         public string CameraSaveDirectory { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Videos");
+
+        // 新規追加設定
+        /// <summary>
+        /// 監視対象のデバイス名。空文字列の場合はシステムのデフォルトを使用
+        /// </summary>
+        public string DeviceName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// コマンド受信用のUDPアドレス
+        /// </summary>
+        public string UdpListenAddress { get; set; } = "127.0.0.1:10001";
+
+        /// <summary>
+        /// 録音ファイルの保存先ディレクトリ
+        /// </summary>
+        public string RecordingsDirectory { get; set; } =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Recordings");
+
+        /// <summary>
+        /// 無音と判定する閾値
+        /// </summary>
+        public int SilenceThreshold { get; set; } = 150;
+
+        /// <summary>
+        /// 音声ありとみなすために必要なサンプル数
+        /// </summary>
+        public int MinAudioSamples { get; set; } = 10;
+
+        /// <summary>
+        /// 録音時に一時ファイルを使用するかどうか
+        /// </summary>
+        public bool UseTempFile { get; set; } = true;
         // コンストラクタ
         private AppSettings() { }
 
