@@ -45,6 +45,14 @@ namespace triggerCam
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is InvalidOperationException)
+            {
+                MessageBox.Show(
+                    "シリアル通信ポートが未接続です。設定を確認してください。",
+                    "COMポートエラー",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
         }
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
