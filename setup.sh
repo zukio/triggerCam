@@ -2,6 +2,16 @@
 
 set -e
 
+# --- Install .NET SDK if missing ---
+if ! command -v dotnet &> /dev/null; then
+  echo "🔧 Installing .NET SDK (apt-based)..."
+  wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  sudo dpkg -i packages-microsoft-prod.deb
+  sudo apt-get update
+  sudo apt-get install -y dotnet-sdk-8.0
+fi
+
+
 echo "📦 Checking dotnet CLI..."
 if ! command -v dotnet &> /dev/null; then
     echo "❌ dotnet CLI is not installed. Please install .NET SDK."
