@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace micNotifyUDP.LogWriter
+namespace triggerCam.LogWriter
 {
     // ===============================
     // Console.WriteLineの出力をファイルにリダイレクト

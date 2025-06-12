@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Threading;
 
-namespace micNotifyUDP.Camera
+namespace triggerCam.Camera
 {
     /// <summary>
     /// Webカメラから静止画・動画を保存するクラス

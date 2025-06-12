@@ -1,8 +1,8 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using micNotifyUDP.Settings;
+using triggerCam.Settings;
 
-namespace micNotifyUDP.Audio
+namespace triggerCam.Audio
 {
     /// <summary>
     /// マイク入力を録音するクラス

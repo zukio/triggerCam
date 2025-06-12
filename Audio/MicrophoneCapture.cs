@@ -10,7 +10,7 @@ MicrophoneCaptureでは：
 using NAudio.Wave;
 using System;
 
-namespace micNotifyUDP.Audio
+namespace triggerCam.Audio
 {
     /// <summary>
     /// マイク入力の取得開始・停止を管理するクラス

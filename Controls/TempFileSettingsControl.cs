@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace micNotify.Controls
+namespace triggerCam.Controls
 {
     /// <summary>
     /// 一時ファイル設定用のカスタムコントロール

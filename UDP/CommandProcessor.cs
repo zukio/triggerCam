@@ -1,9 +1,9 @@
 using System.Net.Sockets;
 using System.Text.Json;
-using micNotifyUDP.Audio;
-using micNotifyUDP.Settings;
+using triggerCam.Audio;
+using triggerCam.Settings;
 
-namespace micNotifyUDP.UDP
+namespace triggerCam.UDP
 {
     /// <summary>
     /// 外部からのコマンドを処理するクラス
@@ -15,9 +15,9 @@ namespace micNotifyUDP.UDP
         private UdpClient udpClient;
         private string udpToIP;
         private int udpToPort;
-        private micNotify.TrayIcon? trayIcon;
+        private triggerCam.TrayIcon? trayIcon;
 
-        public CommandProcessor(WatcherManager watcherManager, UdpClient udpClient, string udpToIP, int udpToPort, AudioRecorder audioRecorder, micNotify.TrayIcon? trayIcon)
+        public CommandProcessor(WatcherManager watcherManager, UdpClient udpClient, string udpToIP, int udpToPort, AudioRecorder audioRecorder, triggerCam.TrayIcon? trayIcon)
         {
             this.watcherManager = watcherManager;
             this.udpClient = udpClient;

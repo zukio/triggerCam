@@ -1,7 +1,7 @@
 ﻿﻿using System.Windows.Forms;
-using micNotify.Controls;
+using triggerCam.Controls;
 
-namespace micNotify
+namespace triggerCam
 {
     partial class TrayIcon
     {

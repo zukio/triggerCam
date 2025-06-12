@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace micNotifyUDP.UDP
+namespace triggerCam.UDP
 {
     internal class UdpAddressChanger
     {

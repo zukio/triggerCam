@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace micNotify.Controls
+namespace triggerCam.Controls
 {
     public class ThresholdControl : UserControl
     {
