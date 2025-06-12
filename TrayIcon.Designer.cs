@@ -45,6 +45,12 @@ namespace triggerCam
             contextMenu_recordingsPath = new RecordingPathToolStripItem();
             contextMenu_openRecordingsDir = new ToolStripMenuItem();
             contextMenu_address = new ToolStripTextBox();
+            contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
+            contextMenu_cameraSettings = new ToolStripMenuItem();
+            contextMenu_resolution = new ToolStripComboBox();
+            contextMenu_frameRate = new ToolStripComboBox();
+            contextMenu_imageFormat = new ToolStripComboBox();
+            contextMenu_recordingStatus = new ToolStripMenuItem();
             contextMenu_save = new ToolStripMenuItem();
             contextMenu_exit = new ToolStripMenuItem();
             notifyIcon1 = new NotifyIcon(components);
@@ -67,6 +73,12 @@ namespace triggerCam
                                                         contextMenu_recordingsPath,
                                                         contextMenu_openRecordingsDir,
                                                         contextMenu_address,
+                                                        contextMenu_cameraSettingsSeparator,
+                                                        contextMenu_cameraSettings,
+                                                        contextMenu_resolution,
+                                                        contextMenu_frameRate,
+                                                        contextMenu_imageFormat,
+                                                        contextMenu_recordingStatus,
                                                         contextMenu_save,
                                                         contextMenu_exit
                                                 });
@@ -142,6 +154,49 @@ namespace triggerCam
             contextMenu_address.Name = "contextMenu_address";
             contextMenu_address.Size = new Size(271, 35);
             contextMenu_address.Text = "127.0.0.1:10000";
+            //
+            // contextMenu_cameraSettingsSeparator
+            //
+            contextMenu_cameraSettingsSeparator.Name = "contextMenu_cameraSettingsSeparator";
+            contextMenu_cameraSettingsSeparator.Size = new Size(328, 6);
+            //
+            // contextMenu_cameraSettings
+            //
+            contextMenu_cameraSettings.Name = "contextMenu_cameraSettings";
+            contextMenu_cameraSettings.Size = new Size(331, 36);
+            contextMenu_cameraSettings.Text = "カメラ設定:";
+            contextMenu_cameraSettings.Enabled = false;
+            //
+            // contextMenu_resolution
+            //
+            contextMenu_resolution.Name = "contextMenu_resolution";
+            contextMenu_resolution.Size = new Size(180, 38);
+            contextMenu_resolution.Text = "解像度";
+            contextMenu_resolution.Items.AddRange(new object[] { "640x480", "1280x720", "1920x1080" });
+            contextMenu_resolution.SelectedIndexChanged += OnSettingChanged;
+            //
+            // contextMenu_frameRate
+            //
+            contextMenu_frameRate.Name = "contextMenu_frameRate";
+            contextMenu_frameRate.Size = new Size(100, 38);
+            contextMenu_frameRate.Text = "FPS";
+            contextMenu_frameRate.Items.AddRange(new object[] { "15", "24", "30", "60" });
+            contextMenu_frameRate.SelectedIndexChanged += OnSettingChanged;
+            //
+            // contextMenu_imageFormat
+            //
+            contextMenu_imageFormat.Name = "contextMenu_imageFormat";
+            contextMenu_imageFormat.Size = new Size(100, 38);
+            contextMenu_imageFormat.Text = "画像形式";
+            contextMenu_imageFormat.Items.AddRange(new object[] { "PNG", "JPG" });
+            contextMenu_imageFormat.SelectedIndexChanged += OnSettingChanged;
+            //
+            // contextMenu_recordingStatus
+            //
+            contextMenu_recordingStatus.Name = "contextMenu_recordingStatus";
+            contextMenu_recordingStatus.Size = new Size(331, 36);
+            contextMenu_recordingStatus.Text = "録画状態: 停止中";
+            contextMenu_recordingStatus.Enabled = false;
             // 
             // contextMenu_save
             // 
@@ -162,7 +217,7 @@ namespace triggerCam
             // 
             notifyIcon1.ContextMenuStrip = context;
             notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
-            notifyIcon1.Text = "AudioWatcher";
+            notifyIcon1.Text = "Camera Recorder";
             notifyIcon1.Visible = true;
             notifyIcon1.MouseClick += trayIcon_MouseClick;
             context.ResumeLayout(false);
@@ -185,5 +240,11 @@ namespace triggerCam
         private ToolStripMenuItem contextMenu_recordingsDirLabel;
         private RecordingPathToolStripItem contextMenu_recordingsPath;
         private ToolStripMenuItem contextMenu_openRecordingsDir;
+        private ToolStripSeparator contextMenu_cameraSettingsSeparator;
+        private ToolStripMenuItem contextMenu_cameraSettings;
+        private ToolStripComboBox contextMenu_resolution;
+        private ToolStripComboBox contextMenu_frameRate;
+        private ToolStripComboBox contextMenu_imageFormat;
+        private ToolStripMenuItem contextMenu_recordingStatus;
     }
 }

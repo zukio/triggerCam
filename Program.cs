@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using triggerCam.Camera;
 using triggerCam.Settings;
+using triggerCam.UDP;
 
 namespace triggerCam
 {
@@ -12,8 +13,13 @@ namespace triggerCam
         private static SerialTriggerListener? serialListener;
         private static CameraRecorder? cameraRecorder;
         private static UdpClient? udpClient;
+        private static UDPServer? udpServer;
+        private static CommandProcessor? commandProcessor;
+        private static TrayIcon? trayIcon;
         private static string udpToIP = "127.0.0.1";
         private static int udpToPort = 10000;
+        private static string udpListenIP = "127.0.0.1";
+        private static int udpListenPort = 10001;
 
         [STAThread]
         static void Main()
@@ -27,13 +33,25 @@ namespace triggerCam
                     MessageBoxIcon.Information);
                 return;
             }
+            
             var settings = AppSettings.Instance;
+            
+            // UDP送信先の設定
             ParseUdpAddress(settings.UdpToAddress, out udpToIP, out udpToPort);
+            
+            // UDP受信の設定
+            ParseUdpAddress(settings.UdpListenAddress, out udpListenIP, out udpListenPort);
+            
+            // UDPクライアントとサーバーの初期化
             udpClient = new UdpClient();
+            udpServer = new UDPServer(udpListenIP, udpListenPort);
+            
+            // カメラレコーダーの初期化
             cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
             cameraRecorder.SnapshotSaved += path => SendUdp($"{{ \"type\": \"snapshot\", \"path\": \"{path}\" }}");
             cameraRecorder.VideoSaved += path => SendUdp($"{{ \"type\": \"video_saved\", \"path\": \"{path}\" }}");
 
+            // シリアルトリガーリスナーの初期化
             serialListener = new SerialTriggerListener(settings.ComPort, settings.BaudRate);
             serialListener.SnapReceived += () => cameraRecorder!.TakeSnapshot(CreateFileName());
             serialListener.StartReceived += () => cameraRecorder!.StartRecording(CreateFileName());
@@ -42,20 +60,45 @@ namespace triggerCam
             serialListener.Start();
 
             ApplicationConfiguration.Initialize();
-            using NotifyIcon notifyIcon = new NotifyIcon
+            
+            // タスクトレイアイコンの初期化
+            trayIcon = new TrayIcon();
+            
+            // コマンドプロセッサの初期化
+            commandProcessor = new CommandProcessor(
+                udpClient, 
+                udpToIP, 
+                udpToPort, 
+                cameraRecorder, 
+                trayIcon);
+            
+            // 定期的にUDPメッセージをチェック
+            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer
             {
-                Text = "Serial Camera Recorder",
-                Icon = System.Drawing.SystemIcons.Application,
-                Visible = true,
-                ContextMenuStrip = new ContextMenuStrip()
+                Interval = 100 // 100ミリ秒ごとにチェック
             };
-            notifyIcon.ContextMenuStrip.Items.Add("Exit", null, (s, e) => Application.Exit());
+            
+            timer.Tick += (sender, e) =>
+            {
+                // キューからUDPデータを取得
+                while (UDPServer_Static.q_UdpData.TryDequeue(out UDP_DATA? data))
+                {
+                    if (data != null)
+                    {
+                        commandProcessor.ProcessCommand(data);
+                    }
+                }
+            };
+            
+            timer.Start();
 
             Application.ApplicationExit += (s, e) =>
             {
+                timer.Stop();
                 serialListener?.Dispose();
                 cameraRecorder?.Dispose();
                 udpClient?.Dispose();
+                udpServer?.Dispose();
             };
 
             Application.Run();

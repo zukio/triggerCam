@@ -24,44 +24,68 @@ namespace triggerCam.Settings
             }
         }
 
-        // 設定項目
-        public string UdpToAddress { get; set; } = "127.0.0.1:10000";
-        public string ComPort { get; set; } = "COM1";
-        public int BaudRate { get; set; } = 9600;
-        public int CameraIndex { get; set; } = 0;
-        public string CameraSaveDirectory { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Videos");
-
-        // 新規追加設定
+        // 基本設定項目
         /// <summary>
-        /// 監視対象のデバイス名。空文字列の場合はシステムのデフォルトを使用
+        /// UDP送信先アドレス
         /// </summary>
-        public string DeviceName { get; set; } = string.Empty;
+        public string UdpToAddress { get; set; } = "127.0.0.1:10000";
+        
+        /// <summary>
+        /// シリアルポート名
+        /// </summary>
+        public string ComPort { get; set; } = "COM1";
+        
+        /// <summary>
+        /// シリアル通信のボーレート
+        /// </summary>
+        public int BaudRate { get; set; } = 9600;
+        
+        /// <summary>
+        /// 使用するカメラのインデックス
+        /// </summary>
+        public int CameraIndex { get; set; } = 0;
+        
+        /// <summary>
+        /// カメラ録画・静止画の保存先ディレクトリ
+        /// </summary>
+        public string CameraSaveDirectory { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Videos");
+        
+        // カメラ設定
+        /// <summary>
+        /// 録画の解像度 - 幅
+        /// </summary>
+        public int VideoWidth { get; set; } = 1280;
+        
+        /// <summary>
+        /// 録画の解像度 - 高さ
+        /// </summary>
+        public int VideoHeight { get; set; } = 720;
+        
+        /// <summary>
+        /// 録画のフレームレート
+        /// </summary>
+        public int FrameRate { get; set; } = 30;
+        
+        /// <summary>
+        /// 映像コーデック (H264, MJPG, etc.)
+        /// </summary>
+        public string VideoCodec { get; set; } = "H264";
+        
+        /// <summary>
+        /// 静止画の画質 (1-100)
+        /// </summary>
+        public int ImageQuality { get; set; } = 95;
+        
+        /// <summary>
+        /// 静止画のフォーマット (png, jpg, etc.)
+        /// </summary>
+        public string ImageFormat { get; set; } = "png";
 
         /// <summary>
         /// コマンド受信用のUDPアドレス
         /// </summary>
         public string UdpListenAddress { get; set; } = "127.0.0.1:10001";
 
-        /// <summary>
-        /// 録音ファイルの保存先ディレクトリ
-        /// </summary>
-        public string RecordingsDirectory { get; set; } =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Recordings");
-
-        /// <summary>
-        /// 無音と判定する閾値
-        /// </summary>
-        public int SilenceThreshold { get; set; } = 150;
-
-        /// <summary>
-        /// 音声ありとみなすために必要なサンプル数
-        /// </summary>
-        public int MinAudioSamples { get; set; } = 10;
-
-        /// <summary>
-        /// 録音時に一時ファイルを使用するかどうか
-        /// </summary>
-        public bool UseTempFile { get; set; } = true;
         // コンストラクタ
         private AppSettings() { }
 

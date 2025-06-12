@@ -2,6 +2,7 @@ using OpenCvSharp;
 using System;
 using System.IO;
 using System.Threading;
+using triggerCam.Settings;
 
 namespace triggerCam.Camera
 {
@@ -17,15 +18,27 @@ namespace triggerCam.Camera
         private readonly int cameraIndex;
         private readonly string saveDirectory;
         private readonly int fps;
+        private readonly int width;
+        private readonly int height;
+        private readonly string videoCodec;
+        private readonly int imageQuality;
+        private readonly string imageFormat;
 
         public event Action<string>? SnapshotSaved;
         public event Action<string>? VideoSaved;
 
         public CameraRecorder(int cameraIndex = 0, string saveDirectory = "Videos", int fps = 30)
         {
+            var settings = AppSettings.Instance;
             this.cameraIndex = cameraIndex;
             this.saveDirectory = saveDirectory;
-            this.fps = fps;
+            this.fps = settings.FrameRate > 0 ? settings.FrameRate : fps;
+            this.width = settings.VideoWidth > 0 ? settings.VideoWidth : 1280;
+            this.height = settings.VideoHeight > 0 ? settings.VideoHeight : 720;
+            this.videoCodec = !string.IsNullOrEmpty(settings.VideoCodec) ? settings.VideoCodec : "H264";
+            this.imageQuality = settings.ImageQuality > 0 ? settings.ImageQuality : 95;
+            this.imageFormat = !string.IsNullOrEmpty(settings.ImageFormat) ? settings.ImageFormat.ToLower() : "png";
+            
             Directory.CreateDirectory(saveDirectory);
         }
 
@@ -38,8 +51,24 @@ namespace triggerCam.Camera
             using var frame = new Mat();
             if (capture!.Read(frame) && !frame.Empty())
             {
-                string path = Path.Combine(saveDirectory, fileName + ".png");
-                Cv2.ImWrite(path, frame);
+                // リサイズが必要な場合
+                if (frame.Width != width || frame.Height != height)
+                {
+                    Cv2.Resize(frame, frame, new OpenCvSharp.Size(width, height));
+                }
+                
+                string extension = imageFormat.ToLower();
+                if (extension != "jpg" && extension != "jpeg" && extension != "png")
+                {
+                    extension = "png"; // デフォルト
+                }
+                
+                string path = Path.Combine(saveDirectory, fileName + "." + extension);
+                
+                // 画質設定
+                var imwriteParams = new int[] { (int)ImwriteFlags.JpegQuality, imageQuality };
+                
+                Cv2.ImWrite(path, frame, imwriteParams);
                 SnapshotSaved?.Invoke(path);
             }
         }
@@ -51,8 +80,21 @@ namespace triggerCam.Camera
         {
             if (isRecording) return;
             EnsureCapture();
+            
             string path = Path.Combine(saveDirectory, fileName + ".mp4");
-            writer = new VideoWriter(path, FourCC.H264, fps, new OpenCvSharp.Size(capture!.FrameWidth, capture.FrameHeight));
+            
+            // FourCCコードを取得
+            var fourCC = GetFourCC(videoCodec);
+            
+            writer = new VideoWriter(path, fourCC, fps, new OpenCvSharp.Size(width, height));
+            
+            if (!writer.IsOpened())
+            {
+                // H264がサポートされていない場合はMJPGにフォールバック
+                writer.Dispose();
+                writer = new VideoWriter(path, FourCC.MJPG, fps, new OpenCvSharp.Size(width, height));
+            }
+            
             isRecording = true;
             recordThread = new Thread(() => RecordLoop(path));
             recordThread.Start();
@@ -73,12 +115,26 @@ namespace triggerCam.Camera
         private void RecordLoop(string path)
         {
             using var frame = new Mat();
+            using var resizedFrame = new Mat();
+            
             while (isRecording && capture!.Read(frame))
             {
                 if (frame.Empty()) continue;
-                writer!.Write(frame);
+                
+                // リサイズが必要な場合
+                if (frame.Width != width || frame.Height != height)
+                {
+                    Cv2.Resize(frame, resizedFrame, new OpenCvSharp.Size(width, height));
+                    writer!.Write(resizedFrame);
+                }
+                else
+                {
+                    writer!.Write(frame);
+                }
+                
                 Cv2.WaitKey(1);
             }
+            
             VideoSaved?.Invoke(path);
         }
 
@@ -91,6 +147,25 @@ namespace triggerCam.Camera
                 {
                     throw new InvalidOperationException("Camera open failed");
                 }
+                
+                // カメラの解像度を設定
+                capture.Set(VideoCaptureProperties.FrameWidth, width);
+                capture.Set(VideoCaptureProperties.FrameHeight, height);
+            }
+        }
+        
+        /// <summary>
+        /// 文字列からFourCCコードを取得
+        /// </summary>
+        private FourCC GetFourCC(string codec)
+        {
+            switch (codec.ToUpper())
+            {
+                case "H264": return FourCC.H264;
+                case "MJPG": return FourCC.MJPG;
+                case "DIVX": return FourCC.DIVX;
+                case "X264": return FourCC.X264;
+                default: return FourCC.H264;
             }
         }
 
