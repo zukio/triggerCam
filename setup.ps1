@@ -13,6 +13,7 @@ $requiredPackages = @{
     "OpenCvSharp4" = "4.9.0"
     "OpenCvSharp4.runtime.win" = "4.9.0"
     "System.IO.Ports" = "8.0.0"
+    "DirectShowLib" = "1.0.0"
 }
 
 Write-Host "必要なNuGetパッケージを確認しています..." -ForegroundColor Cyan
