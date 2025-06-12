@@ -55,8 +55,7 @@ namespace triggerCam
         }        private void LoadSettings()
         {
             if (settings == null) return;
-            
-            // COMポート設定
+              // COMポート設定
             contextMenu_comPortContainer.ClearItems();
             contextMenu_comPortContainer.AddItems(SerialPort.GetPortNames());
             contextMenu_comPortContainer.ComboBoxText = settings.ComPort;
@@ -277,18 +276,19 @@ namespace triggerCam
 
             // UIスレッドで実行
             uiContext.Post(_ => 
-            {
-                isRecording = isRec;
+            {                isRecording = isRec;
                 
                 // タスクトレイアイコンの状態を更新
                 if (isRecording)
                 {
                     notifyIcon1.Text = "録画中...";
+                    contextMenu_recordingStatus.Text = "録画状態: 録画中";
                     // アイコンを録画中のものに変更する場合はここで
                 }
                 else
                 {
                     notifyIcon1.Text = "待機中";
+                    contextMenu_recordingStatus.Text = "録画状態: 停止中";
                     // アイコンを通常のものに戻す場合はここで
                 }
                 
@@ -317,8 +317,19 @@ namespace triggerCam
             bool isImageMode = contextMenu_modeContainer.SelectedIndex == 0;
               // ボタンの表示切替
             contextMenu_triggerSnap.Visible = isImageMode;
-            contextMenu_triggerStart.Visible = !isImageMode;
-            contextMenu_triggerStop.Visible = !isImageMode && isRecording;
+            
+            // 動画モードでは録画状態に応じてスタート/ストップボタンをトグルで表示
+            if (!isImageMode)
+            {
+                contextMenu_triggerStart.Visible = !isRecording;  // 録画中でなければスタートボタンを表示
+                contextMenu_triggerStop.Visible = isRecording;    // 録画中ならストップボタンを表示
+            }
+            else
+            {
+                // 静止画モードでは両方非表示
+                contextMenu_triggerStart.Visible = false;
+                contextMenu_triggerStop.Visible = false;
+            }
               // コーデックコントロールとイメージフォーマットコントロールの表示/非表示を切り替え
             contextMenu_codecContainer.Visible = !isImageMode;
             contextMenu_imageFormatContainer.Visible = isImageMode;

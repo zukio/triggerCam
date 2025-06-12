@@ -9,7 +9,7 @@ namespace triggerCam.Controls
     public class HorizontalLayoutToolStripItem : ToolStripControlHost
     {
         private FlowLayoutPanel _flowPanel;
-        private Label _label;
+        private Label? _label;
         private ComboBox _comboBox;
 
         /// <summary>
@@ -17,8 +17,11 @@ namespace triggerCam.Controls
         /// </summary>
         public string LabelText
         {
-            get { return _label.Text; }
-            set { _label.Text = value; }
+            get { return _label?.Text ?? string.Empty; }
+            set { 
+                if (_label != null)
+                    _label.Text = value; 
+            }
         }
 
         /// <summary>
@@ -121,9 +124,32 @@ namespace triggerCam.Controls
         }
 
         /// <summary>
+        /// ラベルなしでコンボボックスのみを表示するインスタンスを初期化します
+        /// </summary>
+        /// <param name="placeholderText">コンボボックスのプレースホルダーテキスト</param>
+        /// <param name="comboBoxWidth">コンボボックスの幅（オプション）</param>
+        /// <param name="showLabel">ラベルを表示するかどうか</param>
+        public HorizontalLayoutToolStripItem(string placeholderText, int comboBoxWidth, bool showLabel) 
+            : base(CreateCustomControl("", comboBoxWidth, showLabel, placeholderText))
+        {
+            // コントロールへの参照を保持
+            _flowPanel = (FlowLayoutPanel)Control;
+            if (showLabel)
+            {
+                _label = (Label)_flowPanel.Controls[0];
+                _comboBox = (ComboBox)_flowPanel.Controls[1];
+            }
+            else
+            {
+                _label = null;
+                _comboBox = (ComboBox)_flowPanel.Controls[0];
+            }
+        }
+
+        /// <summary>
         /// カスタムコントロールを作成します
         /// </summary>
-        private static Control CreateCustomControl(string labelText, int comboBoxWidth)
+        private static Control CreateCustomControl(string labelText, int comboBoxWidth, bool showLabel = true, string placeholderText = "")
         {
             // 水平方向のFlowLayoutPanelを作成
             var panel = new FlowLayoutPanel
@@ -135,14 +161,18 @@ namespace triggerCam.Controls
                 Padding = new Padding(0)
             };
 
-            // ラベルを作成
-            var label = new Label
+            if (showLabel)
             {
-                Text = labelText,
-                AutoSize = true,
-                TextAlign = System.Drawing.ContentAlignment.MiddleRight,
-                Margin = new Padding(3, 3, 3, 3)
-            };
+                // ラベルを作成
+                var label = new Label
+                {
+                    Text = labelText,
+                    AutoSize = true,
+                    TextAlign = System.Drawing.ContentAlignment.MiddleRight,
+                    Margin = new Padding(3, 3, 3, 3)
+                };
+                panel.Controls.Add(label);
+            }
 
             // コンボボックスを作成
             var comboBox = new ComboBox
@@ -152,8 +182,12 @@ namespace triggerCam.Controls
                 Margin = new Padding(3, 3, 3, 3)
             };
 
-            // コントロールをパネルに追加
-            panel.Controls.Add(label);
+            // プレースホルダーテキストを設定（非ラベルモードの場合）
+            if (!string.IsNullOrEmpty(placeholderText) && !showLabel)
+            {
+                comboBox.Text = placeholderText;
+            }
+
             panel.Controls.Add(comboBox);
 
             return panel;

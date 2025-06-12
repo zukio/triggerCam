@@ -1,4 +1,4 @@
-// filepath: n:\data\WPF\triggerCam\TrayIcon.Designer.cs
+﻿// filepath: n:\data\WPF\triggerCam\TrayIcon.Designer.cs
 using System.Windows.Forms;
 using triggerCam.Controls;
 
@@ -35,12 +35,9 @@ namespace triggerCam
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrayIcon));
             this.context = new ContextMenuStrip(this.components);
-            this.contextMenu_comPortContainer = new HorizontalLayoutToolStripItem("COMポート:", 120);
-            this.contextMenu_baudRateContainer = new HorizontalLayoutToolStripItem("ボーレート:", 100);
-            this.contextMenu_triggerSnap = new ToolStripButton();
-            this.contextMenu_triggerStart = new ToolStripButton();
-            this.contextMenu_triggerStop = new ToolStripButton();
-            this.contextMenu_cameraSelect = new ToolStripComboBox();
+            this.contextMenu_comPortContainer = new HorizontalLayoutToolStripItem("シリアルポート", 120, false);
+            this.contextMenu_baudRateContainer = new HorizontalLayoutToolStripItem("ボーレート", 100, false);
+            this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
             this.contextMenu_modeContainer = new HorizontalLayoutToolStripItem("モード:", 100);
             this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
             this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
@@ -63,15 +60,12 @@ namespace triggerCam
             this.context.Items.AddRange(new ToolStripItem[] {
                                                         this.contextMenu_comPortContainer,
                                                         this.contextMenu_baudRateContainer,
-                                                        this.contextMenu_triggerSnap,
-                                                        this.contextMenu_triggerStart,
-                                                        this.contextMenu_triggerStop,
-                                                        this.contextMenu_cameraSelect,
+                                                        this.contextMenu_cameraControlsContainer,
                                                         this.contextMenu_modeContainer,
                                                         this.contextMenu_recordingsDirLabel,
                                                         this.contextMenu_recordingsPath,
                                                         this.contextMenu_openRecordingsDir,
-                                                        this.contextMenu_address,
+                                                        // this.contextMenu_address,
                                                         this.contextMenu_cameraSettingsSeparator,
                                                         this.contextMenu_imageFormatContainer,
                                                         this.contextMenu_codecContainer,
@@ -81,51 +75,44 @@ namespace triggerCam
                                                 });
             this.context.Name = "context";
             this.context.Size = new Size(332, 158);
+            //
             // 
             // contextMenu_comPortContainer
             //
             this.contextMenu_comPortContainer.Name = "contextMenu_comPortContainer";
-            this.contextMenu_comPortContainer.LabelText = "COMポート:";
             this.contextMenu_comPortContainer.SelectedIndexChanged += OnSettingChanged;
             //
             // contextMenu_baudRateContainer
             //
             this.contextMenu_baudRateContainer.Name = "contextMenu_baudRateContainer";
-            this.contextMenu_baudRateContainer.LabelText = "ボーレート:";
             this.contextMenu_baudRateContainer.AddItems(new object[] { "9600", "19200", "38400", "115200" });
             this.contextMenu_baudRateContainer.SelectedIndexChanged += OnSettingChanged;
-            // 
-            // contextMenu_triggerSnap
             //
-            this.contextMenu_triggerSnap.Name = "contextMenu_triggerSnap";
-            this.contextMenu_triggerSnap.Size = new Size(160, 34);
-            this.contextMenu_triggerSnap.Text = "静止画撮影";
-            this.contextMenu_triggerSnap.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            this.contextMenu_triggerSnap.BackColor = System.Drawing.Color.LightBlue;
-            this.contextMenu_triggerSnap.Click += contextMenu_triggerSnap_Click;
+            // contextMenu_cameraControlsContainer
             //
-            // contextMenu_triggerStart
-            //
-            this.contextMenu_triggerStart.Name = "contextMenu_triggerStart";
-            this.contextMenu_triggerStart.Size = new Size(160, 34);
-            this.contextMenu_triggerStart.Text = "録画開始";
-            this.contextMenu_triggerStart.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            this.contextMenu_triggerStart.BackColor = System.Drawing.Color.LightGreen;
-            this.contextMenu_triggerStart.Click += contextMenu_triggerStart_Click;
-            //
-            // contextMenu_triggerStop
-            //
-            this.contextMenu_triggerStop.Name = "contextMenu_triggerStop";
-            this.contextMenu_triggerStop.Size = new Size(160, 34);
-            this.contextMenu_triggerStop.Text = "録画停止";
-            this.contextMenu_triggerStop.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            this.contextMenu_triggerStop.BackColor = System.Drawing.Color.IndianRed;
-            this.contextMenu_triggerStop.Click += contextMenu_triggerStop_Click;
-            //
-            // contextMenu_cameraSelect
-            //
+            this.contextMenu_cameraControlsContainer.Name = "contextMenu_cameraControlsContainer";
+            
+            // カメラコントロールコンテナに各コントロールを追加
+            this.contextMenu_cameraSelect = this.contextMenu_cameraControlsContainer.AddComboBox(160);
             this.contextMenu_cameraSelect.Name = "contextMenu_cameraSelect";
-            this.contextMenu_cameraSelect.Size = new Size(160, 38);
+            this.contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
+            
+            this.contextMenu_triggerSnap = this.contextMenu_cameraControlsContainer.AddButton("静止画撮影", System.Drawing.Color.LightBlue);
+            this.contextMenu_triggerSnap.Name = "contextMenu_triggerSnap";
+            this.contextMenu_triggerSnap.Click += contextMenu_triggerSnap_Click;
+            
+            this.contextMenu_triggerStart = this.contextMenu_cameraControlsContainer.AddButton("録画開始", System.Drawing.Color.LightGreen);
+            this.contextMenu_triggerStart.Name = "contextMenu_triggerStart";
+            this.contextMenu_triggerStart.Click += contextMenu_triggerStart_Click;
+            
+            this.contextMenu_triggerStop = this.contextMenu_cameraControlsContainer.AddButton("録画停止", System.Drawing.Color.IndianRed);
+            this.contextMenu_triggerStop.Name = "contextMenu_triggerStop";
+            this.contextMenu_triggerStop.Click += contextMenu_triggerStop_Click;
+            
+            // 初期状態ですべてのボタンを表示する（表示/非表示はUpdateButtonVisibility()で制御）
+            this.contextMenu_triggerSnap.Visible = true;
+            this.contextMenu_triggerStart.Visible = true;
+            this.contextMenu_triggerStop.Visible = false;
             //
             // contextMenu_modeContainer
             //
@@ -194,7 +181,7 @@ namespace triggerCam
             this.contextMenu_save.Enabled = false;
             this.contextMenu_save.Name = "contextMenu_save";
             this.contextMenu_save.Size = new Size(331, 36);
-            this.contextMenu_save.Text = "保存";
+            this.contextMenu_save.Text = "設定を保存";
             this.contextMenu_save.Click += contextMenu_save_Click;
             // 
             // contextMenu_exit
@@ -219,10 +206,11 @@ namespace triggerCam
         private ContextMenuStrip context;
         private HorizontalLayoutToolStripItem contextMenu_comPortContainer;
         private HorizontalLayoutToolStripItem contextMenu_baudRateContainer;
-        private ToolStripButton contextMenu_triggerSnap;
-        private ToolStripButton contextMenu_triggerStart;
-        private ToolStripButton contextMenu_triggerStop;
-        private ToolStripComboBox contextMenu_cameraSelect;
+        private HorizontalMultiControlToolStripItem contextMenu_cameraControlsContainer;
+        private Button contextMenu_triggerSnap;
+        private Button contextMenu_triggerStart;
+        private Button contextMenu_triggerStop;
+        private ComboBox contextMenu_cameraSelect;
         private HorizontalLayoutToolStripItem contextMenu_modeContainer;
         private ToolStripMenuItem contextMenu_save;
         private ToolStripMenuItem contextMenu_exit;
