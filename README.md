@@ -1,14 +1,30 @@
-# 元・マイク状態通知アプリ ＞ シリアル通信で受信したトリガーに応じて、PC接続のWebカメラで静止画または動画を撮影・保存し、さらに保存完了時にUDPで通知を送信するタスクトレイ常駐型ユーティリティをC#で開発するためのひな型
+# triggerCam - シリアル通信撮影タスクトレイアプリ
 
-元のアプリは、Windows PC に接続されているマイクの ON/OFF/Mute 状態を検知し、その状態変化を別のプログラムへ UDP で通知するためのバックグラウンドアプリケーションです。また、外部アプリケーションからの命令を受け取り、マイクの操作や録音を行うことができます。
+**バージョン**: 1.0.0
+**更新日**: 2025年6月12日
 
-## 新しいアプリの要件定義
+シリアル通信で受信したトリガーに応じて、PC接続のWebカメラで**静止画**または**動画**を撮影・保存し、さらに保存完了時に**UDPで通知を送信する**タスクトレイ常駐型ユーティリティです。
+
+## 概要
+
+triggerCamは、シリアル通信（COMポート）経由で外部デバイスからのトリガー信号を受け取り、接続されたWebカメラで静止画撮影や動画録画を自動的に行うWindows用タスクトレイアプリケーションです。撮影完了時には指定したIPアドレス・ポートにUDP通知を送信することができます。
+
+## 主な機能
+
+- シリアル通信による遠隔トリガー
+- 静止画撮影（PNG/JPEG形式）
+- 動画録画（MP4形式、H.264エンコード）
+- 撮影完了時のUDP通知
+- タスクトレイ常駐型の軽量設計
+- 多重起動防止機能
+
+## 要件定義
 
 ``` md
 
 # ■ 要件定義書 (Ver.1.2)
 
-**プロジェクト名**: シリアル通信撮影タスクトレイアプリ
+**プロジェクト**: triggerCam シリアル通信撮影タスクトレイアプリ
 **更新日**: 2025年6月12日
 **作成者**: Zukio
 
@@ -140,64 +156,60 @@
 
 ## ダウンロード
 
-最新のリリース版は[こちら](https://github.com/あなたのGitHubユーザー名/リポジトリ名/releases/latest)からダウンロードできます。
+最新のリリース版は[こちら](https://github.com/Zukio/triggerCam/releases/latest)からダウンロードできます。
 
-ダウンロードした ZIP ファイルを解凍し、`micNotifyUDP.exe`を実行してください。
+ダウンロードした ZIP ファイルを解凍し、`triggerCam.exe`を実行してください。
 
 ## バージョン（ブランチ）
 
 - master: 公開ブランチ
 - dev: 開発用／編集中の可能性があります【！】
 
-## 元のアプリの主な機能
+## 使用方法
 
 ### 1. 基本メニュー
 
-アプリケーションを起動すると、タスクバーにアイコンが表示されます。このアイコンをクリックすると、以下のメニュー項目が展開します。
+アプリケーションを起動すると、タスクトレイにアイコンが表示されます。このアイコンをクリックすると、以下のメニュー項目が展開します。
 
 ![Screenshot of the application](Assets/contextMenu.png)
 
 ![Screenshot of the application](Assets/trayIcon.png)
 
-- **マイクリスト**: PC に接続されているマイクの一覧が表示されます。このアプリで監視するマイクを選択できます（システムのデフォルトマイクとは独立して動作します）。
-- **マイク状態**: 選択中のマイクの接続（ON/OFF/Mute）状態を表示・変更します。
-- **録音する／録音停止**
-  - **録音レベル**: 録音時の無音判定閾値を設定できます。
-  - **一時ファイルを使用する**: 一時ディレクトリにファイル保存
-    - **録音データの保存場所**: 録音ファイルの保存場所を設定できます。
-    - **録音データを開く**:  録音ファイルの保存場所をエクスプローラで開きます
-- **UDP アドレス**: 通知先の UDP アドレスを設定できます。
-- **変更して再起動ボタン**: 変更を保存します。
+- **COMポート選択**: PC に接続されているシリアルポートの一覧が表示されます。
+- **ボーレート設定**: シリアル通信のボーレートを設定できます（デフォルト: 9600bps）。
+- **トリガー文字列**: 録画開始・停止・静止画撮影などのトリガー文字列を設定できます。
+- **カメラ選択**: 使用するカメラデバイスを選択できます。
+- **撮影モード**: 静止画撮影 / 動画録画モードを切り替えられます。
+- **撮影データの保存場所**: 撮影ファイルの保存場所を設定できます。
+- **撮影データを開く**: 保存場所をエクスプローラで開きます。
+- **UDP送信先設定**: 通知先のUDPアドレスとポート番号を設定できます。
+- **保存ボタン**: 変更した設定を保存します。
 - **Exit ボタン**: アプリケーションを終了します。
-
-注意：このアプリケーションで選択するマイクデバイスは、システムのデフォルトマイクデバイスとは独立して動作します。例えば、システムでヘッドセットのマイクをデフォルトとして使用しながら、このアプリでは別のUSBマイクの状態を監視するといった使い方ができます。
 
 ### 2. UDP 通信（状態通知）
 
-オーディオの状態の変化を検知すると、以下のメッセージが UDP で送信されます。
+撮影の状態の変化を検知すると、以下のメッセージが UDP で送信されます。
 
-- 接続: `Connected {deviceName}`
-- 接続解除: `disConnected`
-- Mute/Off: `isMute`
-- ON: `ON`
-- 監視デバイス変更: `Changed {deviceName}`
-- 録音開始: `RecStart`
-- 録音停止: `RecStop {recordedFilePath}`
+- カメラ接続: `Connected {deviceName}`
+- カメラ切断: `disConnected`
+- 撮影開始: `RecStart`
+- 静止画撮影完了: `SnapSaved {imagePath}`
+- 動画撮影停止: `RecStop {videoPath}`
 
 ### 3. 外部からのコマンド受信
 
-外部アプリケーションからUDPを通じてコマンドを受信し、マイクの操作や録音を行うことができます。コマンドはJSON形式で送信します。
+外部アプリケーションからUDPを通じてコマンドを受信し、カメラ操作や撮影を行うことができます。コマンドはJSON形式で送信します。
 
 #### コマンド一覧
 
 | コマンド | 説明 | パラメータ | レスポンス |
 |---------|------|-----------|-----------|
 | `exit` | アプリケーションを終了する | なし | `{"status":"success","message":"Application will exit"}` |
-| `mic_on` | マイクをONにする | なし | `{"status":"success","message":"Microphone turned on"}` |
-| `mic_mute` | マイクをミュートにする | なし | `{"status":"success","message":"Microphone muted"}` |
-| `mic_status` | マイクの状態を取得する | なし | `{"status":"success","message":"Microphone is on/muted","data":{"isMuted":false/true}}` |
-| `rec_start` | 録音を開始する | ファイル名と保存パス（省略可） | `{"status":"success","message":"Recording started","data":{"fileName":"ファイル名","path":"保存パス"}}` |
-| `rec_stop` | 録音を停止する | なし | `{"status":"success","message":"Recording stopped","data":{"filePath":"録音ファイルのパス","isEmpty":false}}` |
+| `camera_list` | 利用可能なカメラの一覧を取得 | なし | `{"status":"success","data":{"cameras":["Camera1","Camera2"]}}` |
+| `camera_select` | 使用するカメラを選択 | カメラ名 | `{"status":"success","message":"Camera selected"}` |
+| `snap` | 静止画を撮影 | ファイル名（省略可） | `{"status":"success","data":{"path":"撮影ファイルパス"}}` |
+| `rec_start` | 録画を開始する | ファイル名（省略可） | `{"status":"success","message":"Recording started"}` |
+| `rec_stop` | 録画を停止する | なし | `{"status":"success","data":{"path":"録画ファイルパス"}}` |
 
 #### エラーレスポンス
 
@@ -212,17 +224,18 @@
 
 主なエラーケース：
 
-- マイク操作失敗: デバイスへのアクセスエラーなど
-- 録音開始失敗: ディスク容量不足、権限エラーなど
-- 既に録音中: 録音開始コマンドを重複実行
-- 録音していない: 録音停止コマンドを録音していない状態で実行
+- カメラ操作失敗: デバイスへのアクセスエラーなど
+- 撮影開始失敗: ディスク容量不足、権限エラーなど
+- 既に録画中: 録画開始コマンドを重複実行
+- 録画していない: 録画停止コマンドを録画していない状態で実行
 - 不正なコマンド: 未知のコマンドや不正なパラメータ
 
 #### コマンド送信例
 
 ```json
 {
-  "command": "mic_on"
+  "command": "camera_select",
+  "param": "HD WebCam"
 }
 ```
 
@@ -230,48 +243,46 @@
 {
   "command": "rec_start",
   "param": {
-    "fileName": "recording_20250304",
-    "path": "C:/CustomRecordings"
+    "fileName": "video_20250612",
+    "path": "C:/CustomVideos"
   }
 }
 ```
 
 ```json
 {
-  "command": "rec_start",
-  "param": "recording_20250304"  // ファイル名のみ指定（パスはデフォルト）
+  "command": "snap",
+  "param": "snapshot_20250612"  // ファイル名のみ指定（パスはデフォルト）
 }
 ```
 
-### 4. 録音機能
+### 4. 撮影機能
 
-`rec_start`コマンドで録音を開始し、`rec_stop`コマンドで録音を停止できます。録音ファイルはWAV形式で保存され、以下の優先順位で保存場所が決定されます：
+`rec_start`コマンドで録画を開始し、`rec_stop`コマンドで録画を停止できます。録画ファイルはMP4形式で保存され、以下の優先順位で保存場所が決定されます：
 
 1. UDPのrec_startコマンドで指定されたパス
-2. 起動時引数（/recordingsDir）で指定されたパス
+2. 起動時引数（/videosDir）で指定されたパス
 3. 設定ファイルに保存された値
-4. デフォルト値（実行パスのRecordingsフォルダ）
+4. デフォルト値（実行パスのVideosフォルダ）
 
-録音ファイル名は以下の方法で指定できます：
+静止画の場合は`snap`コマンドを使用し、PNG/JPEG形式で保存されます。
 
-- `rec_start`コマンドの`fileName`パラメータで指定
-- `rec_start`コマンドのパラメータを文字列で直接指定
+ファイル名は以下の方法で指定できます：
+
+- コマンドの`fileName`パラメータで指定
+- コマンドのパラメータを文字列で直接指定
 - 省略時は現在の日時（yyyyMMdd_HHmmss形式）を使用
-
-無音判定：
-
-- 設定された閾値以下の音声レベルが続く場合、その部分は録音されません
-- 閾値はUIのスライダーで調整可能
-- 設定は保存され、次回起動時も維持されます
 
 ### 5. 起動時引数
 
-アプリケーションの起動時に、以下の引数で監視対象のデバイス名や通信用のUDPアドレス、録音ファイルの保存場所を指定できます。
+アプリケーションの起動時に、以下の引数で監視対象のCOMポートやカメラデバイス、通信用のUDPアドレス、ファイルの保存場所を指定できます。
 
-- `/deviceName="your-device-name"` - 監視対象のデバイス名
+- `/comPort="COM3"` - 使用するシリアルポート
+- `/baudRate="9600"` - シリアル通信のボーレート
+- `/cameraName="your-camera-name"` - 使用するカメラデバイス名
 - `/udpTo="127.0.0.1:23456"` - 状態通知の送信先UDPアドレス
 - `/udpListen="127.0.0.1:10001"` - コマンド受信用のUDPアドレス
-- `/recordingsDir="C:/Recordings"` - 録音ファイルの保存場所
+- `/videosDir="C:/Videos"` - 撮影ファイルの保存場所
 
 ### 6. 多重起動制御
 
@@ -285,8 +296,9 @@
 
 アプリケーションは以下のような状況で適切なエラーハンドリングを実装しています：
 
-- マイクデバイスの切断/再接続
-- 録音ファイルの保存失敗
+- カメラデバイスの切断/再接続
+- 撮影ファイルの保存失敗
+- シリアル通信の切断/再接続
 - UDPコマンドの不正な形式
 - メモリリソースの管理
 - ファイルシステムの操作エラー
@@ -300,9 +312,9 @@
 
 ### システム要件
 
-- **オペレーティングシステム**: Windows
+- **オペレーティングシステム**: Windows 10/11 (64bit)
 - **開発環境**: Visual Studio 2022
-- **フレームワーク**: .NET Core, Windows Forms (WinForms)
+- **フレームワーク**: .NET 6.0, Windows Forms (WinForms)
 
 ## 開発者向け情報
 
@@ -312,13 +324,101 @@ WinFormsは、Windowsデスクトップアプリケーションを作成する�
 
 開発環境は Visual Studio 2022 です。
 
-### インストール
+### 開発環境のセットアップ
 
 1. プロジェクトをカスタマイズするには、このリポジトリをクローンまたはダウンロードします。
 2. Visual Studio 2022 でプロジェクトを開きます。
 3. 必要な依存関係や NuGet パッケージをインストールします。
-   - NuGet パッケージ: NAudio
+
+   ```powershell
+   # NuGet パッケージのインストール
+   Install-Package NAudio -Version 2.2.1
+   Install-Package OpenCvSharp4 -Version 4.9.0
+   Install-Package OpenCvSharp4.runtime.win -Version 4.9.0
+   Install-Package System.IO.Ports -Version 8.0.0
+   ```
+
 4. ビルドして実行します。
+
+### セットアップスクリプト
+
+開発環境を素早くセットアップするには、以下のPowerShellスクリプトを`setup.ps1`として保存して実行できます：
+
+```powershell
+# triggerCam セットアップスクリプト
+
+# 実行ポリシーの確認と変更
+$policy = Get-ExecutionPolicy
+if ($policy -ne "RemoteSigned" -and $policy -ne "Unrestricted") {
+    Write-Host "ExecutionPolicy を一時的に変更します..." -ForegroundColor Yellow
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+}
+
+# 依存パッケージのインストール確認
+$requiredPackages = @{
+    "NAudio" = "2.2.1"
+    "OpenCvSharp4" = "4.9.0"
+    "OpenCvSharp4.runtime.win" = "4.9.0"
+    "System.IO.Ports" = "8.0.0"
+}
+
+Write-Host "必要なNuGetパッケージを確認しています..." -ForegroundColor Cyan
+
+# プロジェクトファイルを読み込む
+$csprojPath = ".\triggerCam.csproj"
+if (-not (Test-Path $csprojPath)) {
+    Write-Host "エラー: $csprojPath が見つかりません。カレントディレクトリをプロジェクトのルートに設定してください。" -ForegroundColor Red
+    exit 1
+}
+
+$csprojContent = Get-Content $csprojPath -Raw
+
+# 既存のパッケージをチェックし、必要なパッケージをインストール
+foreach ($package in $requiredPackages.GetEnumerator()) {
+    $packageName = $package.Key
+    $version = $package.Value
+    
+    if (-not ($csprojContent -match "<PackageReference Include=`"$packageName`" Version=`"$version`"")) {
+        Write-Host "$packageName バージョン $version をインストールしています..." -ForegroundColor Yellow
+        dotnet add package $packageName -v $version
+    } else {
+        Write-Host "$packageName バージョン $version は既にインストールされています" -ForegroundColor Green
+    }
+}
+
+# ディレクトリ構造の確認と作成
+$directories = @(
+    ".\bin\Debug\net6.0-windows\Videos",
+    ".\bin\Debug\net6.0-windows\ConsoleLogs"
+)
+
+foreach ($dir in $directories) {
+    if (-not (Test-Path $dir)) {
+        Write-Host "$dir を作成しています..." -ForegroundColor Yellow
+        New-Item -Path $dir -ItemType Directory -Force | Out-Null
+        Write-Host "作成完了: $dir" -ForegroundColor Green
+    } else {
+        Write-Host "$dir は既に存在します" -ForegroundColor Green
+    }
+}
+
+# プロジェクトのビルド
+Write-Host "プロジェクトをビルドしています..." -ForegroundColor Cyan
+dotnet build -c Debug
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "セットアップが完了しました！以下のコマンドでアプリケーションを実行できます：" -ForegroundColor Green
+    Write-Host "dotnet run" -ForegroundColor White -BackgroundColor DarkGreen
+} else {
+    Write-Host "ビルド中にエラーが発生しました。エラーを修正してから再度試してください。" -ForegroundColor Red
+}
+```
+
+このスクリプトを実行するには：
+
+```powershell
+.\setup.ps1
+```
 
 ### 貢献
 
