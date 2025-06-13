@@ -47,6 +47,7 @@ namespace triggerCam.LogWriter
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error deleting log file {file}: {ex.Message}");
+                        global::LogWriter.AddErrorLog(ex, nameof(RotateLogs));
                     }
                 }
 
@@ -70,6 +71,7 @@ namespace triggerCam.LogWriter
             catch (Exception ex)
             {
                 Console.WriteLine($"Error rotating logs: {ex.Message}");
+                global::LogWriter.AddErrorLog(ex, nameof(RotateLogs));
             }
         }
 
@@ -91,6 +93,7 @@ namespace triggerCam.LogWriter
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting total log size: {ex.Message}");
+                global::LogWriter.AddErrorLog(ex, nameof(GetTotalLogSize));
                 return 0;
             }
         }

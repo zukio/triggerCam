@@ -73,6 +73,7 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
         catch (Exception error)
         {
             Console.WriteLine(error.Message, "Receive UDP Data");
+            global::LogWriter.AddErrorLog(error, nameof(ReceiveCallback));
         }
     }
 }

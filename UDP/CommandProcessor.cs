@@ -286,8 +286,9 @@ namespace triggerCam.UDP
 								}
 								string fullPath = Path.Combine(saveDir, fileName + ".mp4");
 
-								StartRecording(fileName, customPath);
-								Program.Notify("success", "RecStart");
+                                                                StartRecording(fileName, customPath);
+                                                                Program.Notify("success", "RecStart");
+                                                                Program.StartRecordingTimeout();
 								// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
 								//SendResponse(new ResponseData
 								//{
@@ -318,7 +319,8 @@ namespace triggerCam.UDP
 							Program.SetRecordSource("success");
 
 							// 録画を停止（VideoSavedイベントが発生する）
-							StopRecording();
+                                                        StopRecording();
+                                                        Program.StopRecordingTimeout();
 
 							// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
 							//SendResponse(new ResponseData
@@ -595,11 +597,12 @@ namespace triggerCam.UDP
 						break;
 				}
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error processing command: {ex.Message}");
-				SendResponse(new ResponseData { status = "error", message = $"Error: {ex.Message}" });
-			}
+                        catch (Exception ex)
+                        {
+                                Console.WriteLine($"Error processing command: {ex.Message}");
+                                global::LogWriter.AddErrorLog(ex, nameof(ProcessCommand));
+                                SendResponse(new ResponseData { status = "error", message = $"Error: {ex.Message}" });
+                        }
 		}
 
 		/// <summary>

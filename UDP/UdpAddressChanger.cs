@@ -17,6 +17,7 @@ namespace triggerCam.UDP
             if (parts.Length != 2)
             {
                 Console.WriteLine("Invalid format. Use IP:Port.");
+                global::LogWriter.AddErrorLog("Invalid UDP address format", nameof(UdpAddressChanger));
                 return;
             }
 
@@ -28,6 +29,7 @@ namespace triggerCam.UDP
             else
             {
                 Console.WriteLine("Invalid IP address.");
+                global::LogWriter.AddErrorLog("Invalid IP address", nameof(UdpAddressChanger));
                 return;
             }
 
@@ -41,12 +43,14 @@ namespace triggerCam.UDP
                 else
                 {
                     Console.WriteLine("Invalid port number. It should be between 0 and 65535.");
+                    global::LogWriter.AddErrorLog("Invalid port number", nameof(UdpAddressChanger));
                     return;
                 }
             }
             else
             {
                 Console.WriteLine("Invalid port number.");
+                global::LogWriter.AddErrorLog("Invalid port number", nameof(UdpAddressChanger));
                 return;
             }
 
