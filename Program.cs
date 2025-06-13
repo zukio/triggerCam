@@ -18,6 +18,7 @@ namespace triggerCam
         private static UDPServer? udpServer;
         private static CommandProcessor? commandProcessor;
         private static TrayIcon? trayIcon;
+        private static System.Windows.Forms.Timer? udpTimer;
         private static string snapshotSource = "success";
         private static string recordSource = "success";
         private static string udpToIP = "127.0.0.1";
@@ -49,21 +50,17 @@ namespace triggerCam
             // UDP受信の設定
             ParseUdpAddress(settings.UdpListenAddress, out udpListenIP, out udpListenPort);
             
-            // UDPクライアントとサーバーの初期化
-            udpClient = new UdpClient();
-            udpServer = new UDPServer(udpListenIP, udpListenPort);
-            
             // カメラレコーダーの初期化
             cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
             cameraRecorder.SnapshotSaved += path =>
             {
                 var data = new Dictionary<string, object> { { "path", path } };
-                UdpNotifier.SendStatus(udpClient!, udpToIP, udpToPort, snapshotSource, "SnapSaved", data);
+                Notify(snapshotSource, "SnapSaved", data);
             };
             cameraRecorder.VideoSaved += path =>
             {
                 var data = new Dictionary<string, object> { { "path", path } };
-                UdpNotifier.SendStatus(udpClient!, udpToIP, udpToPort, recordSource, "RecStop", data);
+                Notify(recordSource, "RecStop", data);
                 trayIcon?.UpdateRecordingState(false);
             };
             
@@ -103,43 +100,18 @@ namespace triggerCam
             
             // タスクトレイアイコンの初期化
             trayIcon = new TrayIcon();
-            
-            // コマンドプロセッサの初期化
-            commandProcessor = new CommandProcessor(
-                udpClient, 
-                udpToIP, 
-                udpToPort, 
-                cameraRecorder, 
-                trayIcon);
-            
-            // 定期的にUDPメッセージをチェック
-            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer
+
+            if (settings.UdpEnabled)
             {
-                Interval = 100 // 100ミリ秒ごとにチェック
-            };
-            
-            timer.Tick += (sender, e) =>
-            {
-                // キューからUDPデータを取得
-                while (UDPServer_Static.q_UdpData.TryDequeue(out UDP_DATA? data))
-                {
-                    if (data != null)
-                    {
-                        commandProcessor.ProcessCommand(data);
-                    }
-                }
-            };
-            
-            timer.Start();
+                StartUdpServices();
+            }
 
             Application.ApplicationExit += (s, e) =>
             {
-                timer.Stop();
+                StopUdpServices();
                 serialListener?.Dispose();
                 cameraRecorder?.Dispose();
                 Notify("success", "disConnected");
-                udpClient?.Dispose();
-                udpServer?.Dispose();
             };
 
             Application.Run();
@@ -147,7 +119,7 @@ namespace triggerCam
 
         private static void SendUdp(string message)
         {
-            if (udpClient != null)
+            if (udpClient != null && AppSettings.Instance.UdpEnabled)
             {
                 UDPSender.SendUDP(udpClient, message, udpToIP, udpToPort);
             }
@@ -158,7 +130,7 @@ namespace triggerCam
 
         public static void Notify(string status, string message, Dictionary<string, object>? data = null)
         {
-            if (udpClient != null)
+            if (udpClient != null && AppSettings.Instance.UdpEnabled)
             {
                 UdpNotifier.SendStatus(udpClient, udpToIP, udpToPort, status, message, data);
             }
@@ -194,6 +166,69 @@ namespace triggerCam
         }
 
         private static string CreateFileName() => DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+        private static void StartUdpServices()
+        {
+            if (udpClient != null)
+                return;
+
+            udpClient = new UdpClient();
+            udpServer = new UDPServer(udpListenIP, udpListenPort);
+            commandProcessor = new CommandProcessor(
+                udpClient,
+                udpToIP,
+                udpToPort,
+                cameraRecorder!,
+                trayIcon!);
+
+            udpTimer = new System.Windows.Forms.Timer
+            {
+                Interval = 100
+            };
+
+            udpTimer.Tick += (sender, e) =>
+            {
+                while (UDPServer_Static.q_UdpData.TryDequeue(out UDP_DATA? data))
+                {
+                    if (data != null)
+                    {
+                        commandProcessor?.ProcessCommand(data);
+                    }
+                }
+            };
+
+            udpTimer.Start();
+        }
+
+        private static void StopUdpServices()
+        {
+            udpTimer?.Stop();
+            udpTimer?.Dispose();
+            udpTimer = null;
+
+            udpClient?.Dispose();
+            udpClient = null;
+
+            udpServer?.Dispose();
+            udpServer = null;
+
+            commandProcessor = null;
+        }
+
+        public static void UpdateUdpEnabled(bool enabled)
+        {
+            var settings = AppSettings.Instance;
+            settings.UdpEnabled = enabled;
+
+            if (enabled)
+            {
+                StartUdpServices();
+            }
+            else
+            {
+                StopUdpServices();
+            }
+        }
 
         /// <summary>
         /// コマンドライン引数を処理する
@@ -289,6 +324,14 @@ namespace triggerCam
                             i++;
                             break;
 
+                        case "--udp":
+                            if (bool.TryParse(value, out bool udpFlag))
+                            {
+                                settings.UdpEnabled = udpFlag;
+                            }
+                            i++;
+                            break;
+
                         case "--save":
                         case "-s":
                             // 設定を保存する場合
@@ -337,6 +380,7 @@ namespace triggerCam
 ネットワーク設定:
   --udpout <IPアドレス:ポート> UDP送信先を指定 (例: 127.0.0.1:10000)
   --udpin <IPアドレス:ポート>  UDP受信設定を指定 (例: 127.0.0.1:10001)
+  --udp <true|false>         UDP機能を有効/無効にする
 
 その他:
   --save, -s <true|false>      設定を保存するかどうか
