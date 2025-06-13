@@ -48,6 +48,7 @@ namespace triggerCam
             contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
             contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
             contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
+            contextMenu_udpEnabled.CheckedChanged += contextMenu_udpEnabled_CheckedChanged;
 
             LoadSettings();
             
@@ -108,6 +109,7 @@ namespace triggerCam
             
             contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
             contextMenu_address.Text = settings.UdpToAddress;
+            contextMenu_udpEnabled.Checked = settings.UdpEnabled;
             
             // モードに応じたフォーマット設定の読み込みはUpdateButtonVisibilityで行う
             
@@ -199,6 +201,7 @@ namespace triggerCam
             settings.CameraIndex = camIdx;
             settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
             settings.UdpToAddress = contextMenu_address.Text;
+            settings.UdpEnabled = contextMenu_udpEnabled.Checked;
               // モードに応じた設定の保存
             if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
             {
@@ -244,6 +247,12 @@ namespace triggerCam
         private void contextMenu_exit_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void contextMenu_udpEnabled_CheckedChanged(object? sender, EventArgs e)
+        {
+            Program.UpdateUdpEnabled(contextMenu_udpEnabled.Checked);
+            contextMenu_save.Enabled = true;
         }
 
         // Called from UDP CommandProcessor
