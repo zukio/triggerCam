@@ -91,6 +91,11 @@ namespace triggerCam.Settings
         /// </summary>
         public bool UdpEnabled { get; set; } = true;
 
+        /// <summary>
+        /// 録画停止トリガー未検出時のタイムアウト(分)
+        /// </summary>
+        public int RecordingTimeoutMinutes { get; set; } = 10;
+
         // コンストラクタ
         private AppSettings() { }
 
@@ -116,6 +121,7 @@ namespace triggerCam.Settings
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading settings: {ex.Message}");
+                global::LogWriter.AddErrorLog(ex, nameof(Load));
             }
 
             Console.WriteLine("Using default settings");
@@ -136,6 +142,7 @@ namespace triggerCam.Settings
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving settings: {ex.Message}");
+                global::LogWriter.AddErrorLog(ex, nameof(Save));
             }
         }
     }

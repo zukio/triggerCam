@@ -19,12 +19,14 @@ namespace triggerCam
         private static CommandProcessor? commandProcessor;
         private static TrayIcon? trayIcon;
         private static System.Windows.Forms.Timer? udpTimer;
+        private static System.Windows.Forms.Timer? recordingTimeoutTimer;
         private static string snapshotSource = "success";
         private static string recordSource = "success";
         private static string udpToIP = "127.0.0.1";
         private static int udpToPort = 10000;
         private static string udpListenIP = "127.0.0.1";
         private static int udpListenPort = 10001;
+        private static int recordingTimeoutMinutes = 10;
 
         [STAThread]
         static void Main(string[] args)
@@ -43,6 +45,7 @@ namespace triggerCam
             var consoleSaver = triggerCam.LogWriter.SaveConsole.Instance;
             
             var settings = AppSettings.Instance;
+            recordingTimeoutMinutes = settings.RecordingTimeoutMinutes;
             
             // コマンドライン引数の処理
             ProcessCommandLineArgs(args, settings);
@@ -90,11 +93,13 @@ namespace triggerCam
                 cameraRecorder!.StartRecording(CreateFileName());
                 Notify("serial", "RecStart");
                 trayIcon?.UpdateRecordingState(true);
+                StartRecordingTimeout();
             };
             serialListener.StopReceived += () =>
             {
                 SetRecordSource("serial");
                 cameraRecorder!.StopRecording();
+                StopRecordingTimeout();
             };
 
             serialListener.Start();
@@ -150,7 +155,10 @@ namespace triggerCam
                     return devices[index].Name;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                global::LogWriter.AddErrorLog(ex, nameof(GetCameraName));
+            }
             return $"Camera {index}";
         }
 
@@ -336,6 +344,16 @@ namespace triggerCam
                             i++;
                             break;
 
+                        case "--timeout":
+                        case "-t":
+                            if (int.TryParse(value, out int to))
+                            {
+                                settings.RecordingTimeoutMinutes = to;
+                                recordingTimeoutMinutes = to;
+                            }
+                            i++;
+                            break;
+
                         case "--save":
                         case "-s":
                             // 設定を保存する場合
@@ -386,6 +404,9 @@ namespace triggerCam
   --udpin <IPアドレス:ポート>  UDP受信設定を指定 (例: 127.0.0.1:10001)
   --udp <true|false>         UDP機能を有効/無効にする
 
+その他設定:
+  --timeout, -t <分>         録画停止トリガーのタイムアウト(分)
+
 その他:
   --save, -s <true|false>      設定を保存するかどうか
   --help, -h, /?              このヘルプを表示
@@ -395,6 +416,44 @@ namespace triggerCam
   triggerCam.exe --camera 1 --resolution 1920x1080 --fps 30 --save true
 ";
             MessageBox.Show(helpMessage, "コマンドライン引数ヘルプ", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private static void ForceStopRecording()
+        {
+            recordingTimeoutTimer?.Stop();
+            recordingTimeoutTimer?.Dispose();
+            recordingTimeoutTimer = null;
+
+            if (cameraRecorder != null && cameraRecorder.IsRecording)
+            {
+                MessageBox.Show(
+                    "録画停止トリガーが一定時間内に検出されません。録画を強制終了します。",
+                    "録画強制終了",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                SetRecordSource("timeout");
+                cameraRecorder.StopRecording();
+                trayIcon?.UpdateRecordingState(false);
+            }
+        }
+
+        public static void StartRecordingTimeout()
+        {
+            StopRecordingTimeout();
+            recordingTimeoutTimer = new System.Windows.Forms.Timer
+            {
+                Interval = recordingTimeoutMinutes * 60 * 1000
+            };
+            recordingTimeoutTimer.Tick += (s, e) => ForceStopRecording();
+            recordingTimeoutTimer.Start();
+        }
+
+        public static void StopRecordingTimeout()
+        {
+            recordingTimeoutTimer?.Stop();
+            recordingTimeoutTimer?.Dispose();
+            recordingTimeoutTimer = null;
         }
 
         /// <summary>

@@ -44,6 +44,7 @@ namespace triggerCam
                     "Platform Not Supported",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+                global::LogWriter.AddErrorLog("Platform not supported", nameof(Start));
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is InvalidOperationException)
             {
@@ -52,6 +53,7 @@ namespace triggerCam
                     "COMポートエラー",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+                global::LogWriter.AddErrorLog(ex, nameof(Start));
             }
         }
 
@@ -67,7 +69,10 @@ namespace triggerCam
                 else if (line.Equals(stopCommand, StringComparison.OrdinalIgnoreCase))
                     StopReceived?.Invoke();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                global::LogWriter.AddErrorLog(ex, nameof(OnDataReceived));
+            }
         }
 
         public void Dispose()

@@ -14,8 +14,9 @@ namespace triggerCam.Camera
 	{
 		private VideoCapture? capture;
 		private VideoWriter? writer;
-		private Thread? recordThread;
-		private bool isRecording = false;
+                private Thread? recordThread;
+                private bool isRecording = false;
+                public bool IsRecording => isRecording;
 		private readonly int cameraIndex;
 		private readonly string saveDirectory;
 		private int fps;
@@ -56,42 +57,49 @@ namespace triggerCam.Camera
 		/// <summary>
 		/// 静止画を撮影して保存
 		/// </summary>
-		public void TakeSnapshot(string fileName)
-		{
-			EnsureCapture();
-			using var frame = new Mat();
-			if (capture!.Read(frame) && !frame.Empty())
-			{
-				// リサイズが必要な場合
-				if (frame.Width != width || frame.Height != height)
-				{
-					Cv2.Resize(frame, frame, new OpenCvSharp.Size(width, height));
-				}
+                public void TakeSnapshot(string fileName)
+                {
+                        try
+                        {
+                                EnsureCapture();
+                                using var frame = new Mat();
+                                if (capture!.Read(frame) && !frame.Empty())
+                                {
+                                        if (frame.Width != width || frame.Height != height)
+                                        {
+                                                Cv2.Resize(frame, frame, new OpenCvSharp.Size(width, height));
+                                        }
 
-				string extension = imageFormat.ToLower();
-				if (extension != "jpg" && extension != "jpeg" && extension != "png")
-				{
-					extension = "png"; // デフォルト
-				}
+                                        string extension = imageFormat.ToLower();
+                                        if (extension != "jpg" && extension != "jpeg" && extension != "png")
+                                        {
+                                                extension = "png";
+                                        }
 
-				string path = Path.Combine(saveDirectory, fileName + "." + extension);
+                                        string path = Path.Combine(saveDirectory, fileName + "." + extension);
 
-				// 画質設定
-				var imwriteParams = new int[] { (int)ImwriteFlags.JpegQuality, imageQuality };
+                                        var imwriteParams = new int[] { (int)ImwriteFlags.JpegQuality, imageQuality };
 
-				Cv2.ImWrite(path, frame, imwriteParams);
-				SnapshotSaved?.Invoke(path);
-			}
-		}
+                                        Cv2.ImWrite(path, frame, imwriteParams);
+                                        SnapshotSaved?.Invoke(path);
+                                }
+                        }
+                        catch (Exception ex)
+                        {
+                                global::LogWriter.AddErrorLog(ex, nameof(TakeSnapshot));
+                        }
+                }
 		/// <summary>
 		/// 動画の録画を開始
 		/// </summary>
 		/// <param name="fileName">録画ファイル名（拡張子なし）</param>
 		/// <param name="customPath">カスタム保存ディレクトリ（指定された場合はsaveDirectoryより優先）</param>
-		public void StartRecording(string fileName, string? customPath = null)
-		{
-			if (isRecording) return;
-			EnsureCapture();
+                public void StartRecording(string fileName, string? customPath = null)
+                {
+                        if (isRecording) return;
+                        try
+                        {
+                                EnsureCapture();
 
 			// カスタムパスが指定されている場合は使用、なければデフォルトパスを使用
 			string saveDir = customPath ?? saveDirectory;
@@ -116,31 +124,51 @@ namespace triggerCam.Camera
 				writer = new VideoWriter(path, FourCC.MJPG, fps, new OpenCvSharp.Size(width, height));
 			}
 
-			isRecording = true;
-			recordThread = new Thread(() => RecordLoop(path));
-			recordThread.Start();
-		}
+                        isRecording = true;
+                        recordThread = new Thread(() => RecordLoop(path));
+                        recordThread.Start();
+                        }
+                        catch (Exception ex)
+                        {
+                                global::LogWriter.AddErrorLog(ex, nameof(StartRecording));
+                        }
+                }
 
 		/// <summary>
 		/// 動画の録画を停止
 		/// </summary>
-		public void StopRecording()
-		{
-			if (!isRecording) return;
-			isRecording = false;
-			recordThread?.Join();
-			writer?.Dispose();
-			writer = null;
-		}
+                public void StopRecording()
+                {
+                        if (!isRecording) return;
+                        try
+                        {
+                                isRecording = false;
+                                recordThread?.Join();
+                                writer?.Dispose();
+                                writer = null;
+                        }
+                        catch (Exception ex)
+                        {
+                                global::LogWriter.AddErrorLog(ex, nameof(StopRecording));
+                        }
+                }
 
 		private void RecordLoop(string path)
 		{
-			using var frame = new Mat();
-			using var resizedFrame = new Mat();
+                        using var frame = new Mat();
+                        using var resizedFrame = new Mat();
 
-			while (isRecording && capture!.Read(frame))
-			{
-				if (frame.Empty()) continue;
+                        try
+                        {
+                                while (isRecording)
+                                {
+                                        if (!capture!.Read(frame))
+                                        {
+                                                global::LogWriter.AddErrorLog("Failed to read frame", nameof(RecordLoop));
+                                                Thread.Sleep(100);
+                                                continue;
+                                        }
+                                        if (frame.Empty()) continue;
 
 				// リサイズが必要な場合
 				if (frame.Width != width || frame.Height != height)
@@ -154,20 +182,33 @@ namespace triggerCam.Camera
 				}
 
 				Cv2.WaitKey(1);
-			}
-
-			VideoSaved?.Invoke(path);
+                                }
+                        }
+                        catch (Exception ex)
+                        {
+                                global::LogWriter.AddErrorLog(ex, nameof(RecordLoop));
+                        }
+                        finally
+                        {
+                                VideoSaved?.Invoke(path);
+                        }
 		}
 
 		private void EnsureCapture()
 		{
 			if (capture == null)
 			{
-				capture = new VideoCapture(cameraIndex);
-				if (!capture.IsOpened())
-				{
-					throw new InvalidOperationException("Camera open failed");
-				}
+                                capture = new VideoCapture(cameraIndex);
+                                if (!capture.IsOpened())
+                                {
+                                        global::LogWriter.AddErrorLog("Camera open failed", nameof(EnsureCapture));
+                                        MessageBox.Show(
+                                                "カメラが見つかりません。デバイスを確認してください。",
+                                                "カメラエラー",
+                                                MessageBoxButtons.OK,
+                                                MessageBoxIcon.Warning);
+                                        throw new InvalidOperationException("Camera open failed");
+                                }
 
 				// カメラの解像度を設定
 				capture.Set(VideoCaptureProperties.FrameWidth, width);
@@ -324,10 +365,11 @@ namespace triggerCam.Camera
 				{
 					EnsureCapture();
 				}
-				catch
-				{
-					// カメラが利用できない場合は保存されている値を返す
-				}
+                                catch (Exception ex)
+                                {
+                                        global::LogWriter.AddErrorLog(ex, nameof(GetSettings));
+                                        // カメラが利用できない場合は保存されている値を返す
+                                }
 			}
 
 			// カメラが利用可能な場合は実際の値を取得
@@ -376,10 +418,11 @@ namespace triggerCam.Camera
 					VideoSaved += (path) => Console.WriteLine($"録画を保存しました: {path}");
 				}
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"カメラのセットアップに失敗しました: {ex.Message}");
-			}
+                        catch (Exception ex)
+                        {
+                                Console.WriteLine($"カメラのセットアップに失敗しました: {ex.Message}");
+                                global::LogWriter.AddErrorLog(ex, nameof(SetupCamera));
+                        }
 		}
 
 		public void Dispose()
