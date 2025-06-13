@@ -40,7 +40,7 @@ namespace triggerCam
 			this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
                         this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
-                        this.contextMenu_udpEnabled = new ToolStripMenuItem();
+                        this.contextMenu_udpEnabled = new UdpEnabledToolStripItem();
 			this.contextMenu_address = new ToolStripTextBox();
 			this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
 			this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
@@ -176,10 +176,8 @@ namespace triggerCam
                         //
                         // contextMenu_udpEnabled
                         //
-                        this.contextMenu_udpEnabled.CheckOnClick = true;
                         this.contextMenu_udpEnabled.Name = "contextMenu_udpEnabled";
-                        this.contextMenu_udpEnabled.Size = new Size(331, 36);
-                        this.contextMenu_udpEnabled.Text = "UDP有効";
+                        this.contextMenu_udpEnabled.Size = new Size(271, 30);
                         //
                         // contextMenu_save
                         //
@@ -225,7 +223,7 @@ namespace triggerCam
 		private ToolStripMenuItem contextMenu_recordingsDirLabel;
                 private RecordingPathToolStripItem contextMenu_recordingsPath;
                 private ToolStripMenuItem contextMenu_openRecordingsDir;
-                private ToolStripMenuItem contextMenu_udpEnabled;
+                private UdpEnabledToolStripItem contextMenu_udpEnabled;
                 private ToolStripSeparator contextMenu_cameraSettingsSeparator;
 		private ToolStripMenuItem contextMenu_recordingStatus;
 		private HorizontalLayoutToolStripItem contextMenu_imageFormatContainer;

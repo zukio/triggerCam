@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using DirectShowLib;
 using OpenCvSharp;
+using triggerCam.Controls;
 using triggerCam.Settings;
 
 namespace triggerCam
@@ -109,7 +110,7 @@ namespace triggerCam
             
             contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
             contextMenu_address.Text = settings.UdpToAddress;
-            contextMenu_udpEnabled.Checked = settings.UdpEnabled;
+            contextMenu_udpEnabled.UdpEnabled = settings.UdpEnabled;
             
             // モードに応じたフォーマット設定の読み込みはUpdateButtonVisibilityで行う
             
@@ -201,7 +202,7 @@ namespace triggerCam
             settings.CameraIndex = camIdx;
             settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
             settings.UdpToAddress = contextMenu_address.Text;
-            settings.UdpEnabled = contextMenu_udpEnabled.Checked;
+            settings.UdpEnabled = contextMenu_udpEnabled.UdpEnabled;
               // モードに応じた設定の保存
             if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
             {
@@ -251,7 +252,7 @@ namespace triggerCam
 
         private void contextMenu_udpEnabled_CheckedChanged(object? sender, EventArgs e)
         {
-            Program.UpdateUdpEnabled(contextMenu_udpEnabled.Checked);
+            Program.UpdateUdpEnabled(contextMenu_udpEnabled.UdpEnabled);
             contextMenu_save.Enabled = true;
         }
 

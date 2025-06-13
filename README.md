@@ -194,7 +194,7 @@ triggerCam.exe /comPort="COM3" /baudRate="9600" /cameraName="HD WebCam" /videosD
 - `/cameraName="your-camera-name"` - 使用するカメラデバイス名
 - `/udpTo="127.0.0.1:23456"` - 状態通知の送信先UDPアドレス
 - `/udpListen="127.0.0.1:10001"` - コマンド受信用のUDPアドレス
-- `--udp false` - UDP機能を有効/無効にする
+ - `--udp false` - UDP機能を有効/無効にする
 - `/videosDir="C:/Videos"` - 撮影ファイルの保存場所
 
 ### 6. 多重起動制御
