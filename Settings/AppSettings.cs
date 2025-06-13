@@ -86,6 +86,11 @@ namespace triggerCam.Settings
         /// </summary>
         public string UdpListenAddress { get; set; } = "127.0.0.1:10001";
 
+        /// <summary>
+        /// UDP機能を有効にするかどうか
+        /// </summary>
+        public bool UdpEnabled { get; set; } = true;
+
         // コンストラクタ
         private AppSettings() { }
 
