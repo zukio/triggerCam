@@ -105,19 +105,18 @@ triggerCamは、シリアル通信（COMポート）経由で外部デバイス�
 - `get_settings`: 現在のカメラ設定を取得します
 - `exit`: アプリケーションを終了します
 
-#### カメラ設定変更の例
+#### コマンド送信例
 
 ```json
-// 解像度を設定
+// カメラを選択
 {
-  "command": "set_resolution",
-  "param": "1920x1080"
+  "command": "camera_select",
+  "param": "HD WebCam"
 }
-
-// フレームレートを設定
+// 撮影
 {
-  "command": "set_framerate",
-  "param": "60"
+  "command": "snap",
+  "param": "snapshot_20250612"
 }
 
 // 画像フォーマットを設定
@@ -162,32 +161,6 @@ triggerCamは、シリアル通信（COMポート）経由で外部デバイス�
 - 既に録画中: 録画開始コマンドを重複実行
 - 録画していない: 録画停止コマンドを録画していない状態で実行
 - 不正なコマンド: 未知のコマンドや不正なパラメータ
-
-#### コマンド送信例
-
-```json
-{
-  "command": "camera_select",
-  "param": "HD WebCam"
-}
-```
-
-```json
-{
-  "command": "rec_start",
-  "param": {
-    "fileName": "video_20250612",
-    "path": "C:/CustomVideos"
-  }
-}
-```
-
-```json
-{
-  "command": "snap",
-  "param": "snapshot_20250612"  // ファイル名のみ指定（パスはデフォルト）
-}
-```
 
 ### 撮影機能
 
