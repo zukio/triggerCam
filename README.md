@@ -105,19 +105,18 @@ triggerCamは、シリアル通信（COMポート）経由で外部デバイス�
 - `get_settings`: 現在のカメラ設定を取得します
 - `exit`: アプリケーションを終了します
 
-#### カメラ設定変更の例
+#### コマンド送信例
 
 ```json
-// 解像度を設定
+// カメラを選択
 {
-  "command": "set_resolution",
-  "param": "1920x1080"
+  "command": "camera_select",
+  "param": "HD WebCam"
 }
-
-// フレームレートを設定
+// 撮影
 {
-  "command": "set_framerate",
-  "param": "60"
+  "command": "snap",
+  "param": "snapshot_20250612"
 }
 
 // 画像フォーマットを設定
@@ -163,32 +162,6 @@ triggerCamは、シリアル通信（COMポート）経由で外部デバイス�
 - 録画していない: 録画停止コマンドを録画していない状態で実行
 - 不正なコマンド: 未知のコマンドや不正なパラメータ
 
-#### コマンド送信例
-
-```json
-{
-  "command": "camera_select",
-  "param": "HD WebCam"
-}
-```
-
-```json
-{
-  "command": "rec_start",
-  "param": {
-    "fileName": "video_20250612",
-    "path": "C:/CustomVideos"
-  }
-}
-```
-
-```json
-{
-  "command": "snap",
-  "param": "snapshot_20250612"  // ファイル名のみ指定（パスはデフォルト）
-}
-```
-
 ### 撮影機能
 
 `rec_start`コマンドで録画を開始し、`rec_stop`コマンドで録画を停止できます。録画ファイルはMP4形式で保存され、以下の優先順位で保存場所が決定されます：
@@ -221,7 +194,7 @@ triggerCam.exe /comPort="COM3" /baudRate="9600" /cameraName="HD WebCam" /videosD
 - `/cameraName="your-camera-name"` - 使用するカメラデバイス名
 - `/udpTo="127.0.0.1:23456"` - 状態通知の送信先UDPアドレス
 - `/udpListen="127.0.0.1:10001"` - コマンド受信用のUDPアドレス
- - `--udp false` - UDP機能を有効/無効にする
+- `--udp false` - UDP機能を有効/無効にする
 - `/videosDir="C:/Videos"` - 撮影ファイルの保存場所
 
 ### 6. 多重起動制御
