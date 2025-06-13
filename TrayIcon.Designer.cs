@@ -39,8 +39,8 @@ namespace triggerCam
 			this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
 			this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
-                        this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
-                        this.contextMenu_udpEnabled = new UdpEnabledToolStripItem();
+			this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
+			this.contextMenu_udpEnabled = new UdpEnabledToolStripItem();
 			this.contextMenu_address = new ToolStripTextBox();
 			this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
 			this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
@@ -64,16 +64,15 @@ namespace triggerCam
                                                         // this.contextMenu_address,
 																												this.contextMenu_imageFormatContainer,
 																												this.contextMenu_codecContainer,
-                                                                               this.contextMenu_recordingStatus,
-                                                                               this.contextMenu_openRecordingsDir,
-                                                                               this.contextMenu_udpEnabled,
-                                                                               this.contextMenu_cameraSettingsSeparator,
+																												this.contextMenu_recordingStatus,
+																												this.contextMenu_openRecordingsDir,
+																												this.contextMenu_udpEnabled,
+																												this.contextMenu_cameraSettingsSeparator,
 																												this.contextMenu_save,
 																												this.contextMenu_exit
 																								});
 			this.context.Name = "context";
 			this.context.Size = new Size(332, 158);
-			//
 			//
 			// contextMenu_serialContainer
 			//
@@ -169,19 +168,19 @@ namespace triggerCam
 			// 
 			// contextMenu_openRecordingsDir
 			// 
-                        this.contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
-                        this.contextMenu_openRecordingsDir.Size = new Size(331, 36);
-                        this.contextMenu_openRecordingsDir.Text = "保存済データを開く";
-                        this.contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
-                        //
-                        // contextMenu_udpEnabled
-                        //
-                        this.contextMenu_udpEnabled.Name = "contextMenu_udpEnabled";
-                        this.contextMenu_udpEnabled.Size = new Size(271, 30);
-                        //
-                        // contextMenu_save
-                        //
-                        this.contextMenu_save.Enabled = false;
+			this.contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
+			this.contextMenu_openRecordingsDir.Size = new Size(331, 36);
+			this.contextMenu_openRecordingsDir.Text = "保存済データを開く";
+			this.contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
+			//
+			// contextMenu_udpEnabled
+			//
+			this.contextMenu_udpEnabled.Name = "contextMenu_udpEnabled";
+			this.contextMenu_udpEnabled.Size = new Size(271, 30);
+			//
+			// contextMenu_save
+			//
+			this.contextMenu_save.Enabled = false;
 			this.contextMenu_save.Name = "contextMenu_save";
 			this.contextMenu_save.Size = new Size(331, 36);
 			this.contextMenu_save.Text = "設定を保存";
@@ -221,10 +220,10 @@ namespace triggerCam
 		private NotifyIcon notifyIcon1;
 		private ToolStripTextBox contextMenu_address;
 		private ToolStripMenuItem contextMenu_recordingsDirLabel;
-                private RecordingPathToolStripItem contextMenu_recordingsPath;
-                private ToolStripMenuItem contextMenu_openRecordingsDir;
-                private UdpEnabledToolStripItem contextMenu_udpEnabled;
-                private ToolStripSeparator contextMenu_cameraSettingsSeparator;
+		private RecordingPathToolStripItem contextMenu_recordingsPath;
+		private ToolStripMenuItem contextMenu_openRecordingsDir;
+		private UdpEnabledToolStripItem contextMenu_udpEnabled;
+		private ToolStripSeparator contextMenu_cameraSettingsSeparator;
 		private ToolStripMenuItem contextMenu_recordingStatus;
 		private HorizontalLayoutToolStripItem contextMenu_imageFormatContainer;
 		private HorizontalLayoutToolStripItem contextMenu_codecContainer;
