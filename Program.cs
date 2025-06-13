@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading;
 using DirectShowLib;
 using triggerCam.Camera;
 using triggerCam.Settings;
@@ -27,10 +28,23 @@ namespace triggerCam
         private static string udpListenIP = "127.0.0.1";
         private static int udpListenPort = 10001;
         private static int recordingTimeoutMinutes = 10;
+        private static Mutex? appMutex;
 
         [STAThread]
         static void Main(string[] args)
         {
+            bool createdNew;
+            appMutex = new Mutex(true, "triggerCamAppMutex", out createdNew);
+            if (!createdNew)
+            {
+                MessageBox.Show(
+                    "すでに起動中です",
+                    "triggerCam",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 MessageBox.Show(
@@ -121,6 +135,8 @@ namespace triggerCam
                 cameraRecorder?.Dispose();
                 triggerCam.LogWriter.SaveConsole.Instance.Dispose();
                 Notify("success", "disConnected");
+                appMutex?.ReleaseMutex();
+                appMutex?.Dispose();
             };
 
             Application.Run();
