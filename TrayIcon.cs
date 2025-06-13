@@ -34,8 +34,10 @@ namespace triggerCam
             container.Add(this);
             InitializeComponent();
             Initialize();
-        }        private void Initialize()
-        {            uiContext = SynchronizationContext.Current;
+        }
+        private void Initialize()
+        {
+            uiContext = SynchronizationContext.Current;
             settings = AppSettings.Instance;
 
             context.Opened += ContextOpened;
@@ -48,12 +50,14 @@ namespace triggerCam
             contextMenu_udpSettings.AddressChanged += OnAddressChanged;
             contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
             contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
+            contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
 
             LoadSettings();
             
             // 初期状態でのモードに応じたボタン表示の更新
             UpdateButtonVisibility();
-        }        private void LoadSettings()
+        }
+        private void LoadSettings()
         {
             if (settings == null) return;
               // COMポート設定contextMenu_comPortSelect.Items.Clear();
