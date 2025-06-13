@@ -442,6 +442,7 @@ namespace triggerCam
             if (cameraRecorder != null)
             {
                 string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                Program.SetSnapshotSource("manual");
                 cameraRecorder.TakeSnapshot(fileName);
             }
         }
@@ -456,7 +457,9 @@ namespace triggerCam
             if (cameraRecorder != null && !isRecording)
             {
                 string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                Program.SetRecordSource("manual");
                 cameraRecorder.StartRecording(fileName);
+                Program.Notify("manual", "RecStart");
                 isRecording = true;
                 UpdateRecordingState(true);
             }
@@ -471,6 +474,7 @@ namespace triggerCam
             var cameraRecorder = Program.GetCameraRecorder();
             if (cameraRecorder != null && isRecording)
             {
+                Program.SetRecordSource("manual");
                 cameraRecorder.StopRecording();
                 isRecording = false;
                 UpdateRecordingState(false);

@@ -60,13 +60,25 @@ triggerCamは、シリアル通信（COMポート）経由で外部デバイス�
 
 ### UDP通知機能
 
-撮影の状態変化時に以下のメッセージがUDPで送信されます：
+撮影の状態変化時に以下のJSONメッセージがUDPで送信されます：
 
-- カメラ接続: `Connected {deviceName}`
-- カメラ切断: `disConnected`
-- 撮影開始: `RecStart`
-- 静止画撮影完了: `SnapSaved {imagePath}`
-- 動画撮影停止: `RecStop {videoPath}`
+- カメラ接続（選択切り替え時）:
+  - `{"status":"success","message":"Connected","data":{"id":deviceID,"name":deviceName}}`
+  - `{"status":"serial","message":"Connected","data":{"id":deviceID,"name":deviceName}}`
+  - `{"status":"manual","message":"Connected","data":{"id":deviceID,"name":deviceName}}`
+- カメラ切断: `{"status":"success","message":"disConnected"}`
+- 静止画撮影完了:
+  - `{"status":"success","message":"SnapSaved","data":{"path":imagePath}}`
+  - `{"status":"serial","message":"SnapSaved","data":{"path":imagePath}}`
+  - `{"status":"manual","message":"SnapSaved","data":{"path":imagePath}}`
+- 撮影開始:
+  - `{"status":"success","message":"RecStart"}`
+  - `{"status":"serial","message":"RecStart"}`
+  - `{"status":"manual","message":"RecStart"}`
+- 動画撮影停止:
+  - `{"status":"success","message":"RecStop","data":{"path":videoPath}}`
+  - `{"status":"serial","message":"RecStop","data":{"path":videoPath}}`
+  - `{"status":"manual","message":"RecStop","data":{"path":videoPath}}`
 
 ### 外部からのコマンド制御
 
