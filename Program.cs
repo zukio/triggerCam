@@ -38,6 +38,9 @@ namespace triggerCam
                     MessageBoxIcon.Information);
                 return;
             }
+
+            // Initialize log redirection
+            var consoleSaver = triggerCam.LogWriter.SaveConsole.Instance;
             
             var settings = AppSettings.Instance;
             
@@ -111,6 +114,7 @@ namespace triggerCam
                 StopUdpServices();
                 serialListener?.Dispose();
                 cameraRecorder?.Dispose();
+                triggerCam.LogWriter.SaveConsole.Instance.Dispose();
                 Notify("success", "disConnected");
             };
 

@@ -49,7 +49,8 @@ namespace triggerCam.LogWriter
             // B. MultiTextWriterによってConsole.WriteLine()を複数の出力先にリダイレクト
             // DebugTextWriter クラスを用いて Console.WriteLine() の出力を Debug 出力にリダイレクト
             DebugTextWriter debugTextWriter = new DebugTextWriter();
-            multiTextWriter = new MultiTextWriter(sw, debugTextWriter);
+            LogWriterTextWriter logWriterTextWriter = new LogWriterTextWriter();
+            multiTextWriter = new MultiTextWriter(sw, debugTextWriter, logWriterTextWriter);
 
             // B. これ以降のConsole.WriteLine()がファイルとデバッグ出力に書き込まれる
             Console.SetOut(multiTextWriter);
