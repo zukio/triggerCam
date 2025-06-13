@@ -182,17 +182,51 @@ namespace triggerCam.UDP
 							{
 								fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 							}
-
 							Program.SetSnapshotSource("success");
-							cameraRecorder.TakeSnapshot(fileName);
-							SendResponse(new ResponseData
+
+							// パラメータからカスタムパスを取得
+							string? customPath = null;
+							if (!string.IsNullOrEmpty(command.param))
 							{
-								status = "success",
-								message = "SnapSaved",
-								data = new Dictionary<string, object> {
-																		{ "path", fileName }
-																}
-							});
+								try
+								{
+									var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
+									customPath = paramObj?.GetValueOrDefault("customPath");
+								}
+								catch
+								{
+									// JSONパースエラーの場合はカスタムパスなし
+								}
+							}
+
+							// 実際のファイルパスを計算
+							var settings = cameraRecorder.GetSettings();
+							string extension = settings["imageFormat"].ToString() ?? "png";
+							// 拡張子の正規化
+							if (extension != "jpg" && extension != "jpeg" && extension != "png" && extension != "bmp")
+							{
+								extension = "png"; // デフォルト
+							}
+
+							// 保存ディレクトリを取得（カスタムパスが指定されていればそちらを優先）
+							string saveDir = customPath ?? AppSettings.Instance.CameraSaveDirectory;
+							// ディレクトリが存在しない場合は作成
+							if (!string.IsNullOrEmpty(saveDir) && !Directory.Exists(saveDir))
+							{
+								Directory.CreateDirectory(saveDir);
+							}
+
+
+							// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
+							// string fullPath = Path.Combine(saveDir, fileName + "." + extension);
+							//SendResponse(new ResponseData
+							//{
+							//	status = "success",
+							//	message = "SnapSaved",
+							//	data = new Dictionary<string, object> {
+							//		{ "path", fullPath }
+							//	}
+							//});
 						}
 						catch (Exception ex)
 						{
@@ -226,18 +260,43 @@ namespace triggerCam.UDP
 								{
 									fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 								}
-
 								Program.SetRecordSource("success");
-								StartRecording(fileName);
-								Program.Notify("success", "RecStart");
-								SendResponse(new ResponseData
+
+								// パラメータからカスタムパスを取得
+								string? customPath = null;
+								if (!string.IsNullOrEmpty(command.param))
 								{
-									status = "success",
-									message = "RecStart",
-									data = new Dictionary<string, object> {
-										{ "path", fileName },
+									try
+									{
+										var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
+										customPath = paramObj?.GetValueOrDefault("customPath");
 									}
-								});
+									catch
+									{
+										// JSONパースエラーの場合はカスタムパスなし
+									}
+								}
+
+								// 実際のファイルパスを計算
+								string saveDir = customPath ?? AppSettings.Instance.CameraSaveDirectory;
+								// ディレクトリが存在しない場合は作成
+								if (!string.IsNullOrEmpty(saveDir) && !Directory.Exists(saveDir))
+								{
+									Directory.CreateDirectory(saveDir);
+								}
+								string fullPath = Path.Combine(saveDir, fileName + ".mp4");
+
+								StartRecording(fileName, customPath);
+								Program.Notify("success", "RecStart");
+								// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
+								//SendResponse(new ResponseData
+								//{
+								//	status = "success",
+								//	message = "RecStart",
+								//	data = new Dictionary<string, object> {
+								//		{ "path", fullPath },
+								//	}
+								//});
 
 								// TrayIconの録画状態を更新
 								trayIcon?.UpdateRecordingState(true);
@@ -257,13 +316,16 @@ namespace triggerCam.UDP
 						if (IsRecording())
 						{
 							Program.SetRecordSource("success");
+
+							// 録画を停止（VideoSavedイベントが発生する）
 							StopRecording();
 
-							SendResponse(new ResponseData
-							{
-								status = "success",
-								message = "RecStop"
-							});
+							// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
+							//SendResponse(new ResponseData
+							//{
+							//	status = "success",
+							//	message = "RecStop"
+							//});
 
 							// TrayIconの録画状態を更新
 							trayIcon?.UpdateRecordingState(false);
