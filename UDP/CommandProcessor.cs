@@ -2,6 +2,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using triggerCam.Camera;
 using triggerCam.Settings;
+using triggerCam;
 
 namespace triggerCam.UDP
 {
@@ -168,11 +169,12 @@ namespace triggerCam.UDP
                                 fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                             }
                             
+                            Program.SetSnapshotSource("success");
                             cameraRecorder.TakeSnapshot(fileName);
-                            SendResponse(new ResponseData { 
-                                status = "success", 
+                            SendResponse(new ResponseData {
+                                status = "success",
                                 message = "Snapshot taken",
-                                data = new Dictionary<string, object> { 
+                                data = new Dictionary<string, object> {
                                     { "fileName", fileName }
                                 }
                             });
@@ -208,11 +210,13 @@ namespace triggerCam.UDP
                                     fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                                 }
                                 
+                                Program.SetRecordSource("success");
                                 StartRecording(fileName);
-                                SendResponse(new ResponseData { 
-                                    status = "success", 
+                                Program.Notify("success", "RecStart");
+                                SendResponse(new ResponseData {
+                                    status = "success",
                                     message = "Recording started",
-                                    data = new Dictionary<string, object> { 
+                                    data = new Dictionary<string, object> {
                                         { "fileName", fileName }
                                     }
                                 });
@@ -232,6 +236,7 @@ namespace triggerCam.UDP
                         // 録画中であれば停止
                         if (IsRecording())
                         {
+                            Program.SetRecordSource("success");
                             StopRecording();
                             
                             SendResponse(new ResponseData { 

@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using DirectShowLib;
 using triggerCam.Camera;
 using triggerCam.Settings;
 using triggerCam.UDP;
@@ -16,6 +18,8 @@ namespace triggerCam
         private static UDPServer? udpServer;
         private static CommandProcessor? commandProcessor;
         private static TrayIcon? trayIcon;
+        private static string snapshotSource = "success";
+        private static string recordSource = "success";
         private static string udpToIP = "127.0.0.1";
         private static int udpToPort = 10000;
         private static string udpListenIP = "127.0.0.1";
@@ -51,17 +55,47 @@ namespace triggerCam
             
             // カメラレコーダーの初期化
             cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
-            cameraRecorder.SnapshotSaved += path => SendUdp($"{{ \"type\": \"snapshot\", \"path\": \"{path}\" }}");
-            cameraRecorder.VideoSaved += path => SendUdp($"{{ \"type\": \"video_saved\", \"path\": \"{path}\" }}");
+            cameraRecorder.SnapshotSaved += path =>
+            {
+                var data = new Dictionary<string, object> { { "path", path } };
+                UdpNotifier.SendStatus(udpClient!, udpToIP, udpToPort, snapshotSource, "SnapSaved", data);
+            };
+            cameraRecorder.VideoSaved += path =>
+            {
+                var data = new Dictionary<string, object> { { "path", path } };
+                UdpNotifier.SendStatus(udpClient!, udpToIP, udpToPort, recordSource, "RecStop", data);
+                trayIcon?.UpdateRecordingState(false);
+            };
             
             // カメラをセットアップして実際の解像度とフレームレートを取得
             cameraRecorder.SetupCamera();
+            var camName = GetCameraName(settings.CameraIndex);
+            var conData = new Dictionary<string, object>
+            {
+                { "id", settings.CameraIndex },
+                { "name", camName }
+            };
+            Notify("success", "Connected", conData);
 
             // シリアルトリガーリスナーの初期化
             serialListener = new SerialTriggerListener(settings.ComPort, settings.BaudRate);
-            serialListener.SnapReceived += () => cameraRecorder!.TakeSnapshot(CreateFileName());
-            serialListener.StartReceived += () => cameraRecorder!.StartRecording(CreateFileName());
-            serialListener.StopReceived += () => cameraRecorder!.StopRecording();
+            serialListener.SnapReceived += () =>
+            {
+                SetSnapshotSource("serial");
+                cameraRecorder!.TakeSnapshot(CreateFileName());
+            };
+            serialListener.StartReceived += () =>
+            {
+                SetRecordSource("serial");
+                cameraRecorder!.StartRecording(CreateFileName());
+                Notify("serial", "RecStart");
+                trayIcon?.UpdateRecordingState(true);
+            };
+            serialListener.StopReceived += () =>
+            {
+                SetRecordSource("serial");
+                cameraRecorder!.StopRecording();
+            };
 
             serialListener.Start();
 
@@ -103,6 +137,7 @@ namespace triggerCam
                 timer.Stop();
                 serialListener?.Dispose();
                 cameraRecorder?.Dispose();
+                Notify("success", "disConnected");
                 udpClient?.Dispose();
                 udpServer?.Dispose();
             };
@@ -116,6 +151,31 @@ namespace triggerCam
             {
                 UDPSender.SendUDP(udpClient, message, udpToIP, udpToPort);
             }
+        }
+
+        public static void SetSnapshotSource(string src) => snapshotSource = src;
+        public static void SetRecordSource(string src) => recordSource = src;
+
+        public static void Notify(string status, string message, Dictionary<string, object>? data = null)
+        {
+            if (udpClient != null)
+            {
+                UdpNotifier.SendStatus(udpClient, udpToIP, udpToPort, status, message, data);
+            }
+        }
+
+        private static string GetCameraName(int index)
+        {
+            try
+            {
+                var devices = new List<DsDevice>(DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice));
+                if (index >= 0 && index < devices.Count)
+                {
+                    return devices[index].Name;
+                }
+            }
+            catch { }
+            return $"Camera {index}";
         }
 
         private static void ParseUdpAddress(string address, out string ip, out int port)
