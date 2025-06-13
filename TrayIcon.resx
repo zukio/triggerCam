@@ -124,30 +124,6 @@
     <value>41, 34</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="notifyIcon1.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAEtLSwBLS0sHS0tLS0tLS6tLS0vmS0tL/EtLS/xLS0vmS0tLq0tLS0tLS0sHS0tLAAAA
-        AAAAAAAAS0tLAEtLSwBLS0saS0tLlUtLS/BLS0v/S0tL/0tLS/9LS0v/S0tL/0tLS/9LS0vwS0tLlUtL
-        SxpLS0sAS0tLAEtLSwBLS0saS0tLs0tLS/9LS0v/S0tL/0tLS/9LS0v+S0tL/ktLS/9LS0v/S0tL/0tL
-        S/9LS0uzS0tLGktLSwBLS0sHS0tLlUtLS/9LS0v/S0tL/0tLS/9LS0v/S0tLr0tLS69LS0v/S0tL/0tL
-        S/9LS0v/S0tL/0tLS5VLS0sHS0tLTEtLS+5LS0v/S0tL/0tLS/9LS0v8S0tLzktLS1NLS0tTS0tLzktL
-        S/xLS0v/S0tL/0tLS/9LS0vuS0tLTEtLS6pLS0v/S0tL/0tLS/9LS0v7S0tLl0tLS3FLS0upS0tLqUtL
-        S3FLS0uXS0tL+0tLS/9LS0v/S0tL/0tLS6pLS0vlS0tL/0tLS/9LS0v/S0tLvktLS3ZLS0vRS0tLh0tL
-        S4dLS0vRS0tLdktLS75LS0v/S0tL/0tLS/9LS0vlS0tL/EtLS/9LS0v/S0tL/0tLS4RLS0u7S0tLgEtL
-        S7BLS0uwS0tLgEtLS7tLS0uES0tL/0tLS/9LS0v/S0tL/EtLS/xLS0v/S0tL/0tLS/9LS0uoS0tL1ktL
-        S3VLS0vpS0tL6UtLS3VLS0vWS0tLqEtLS/9LS0v/S0tL/0tLS/xLS0vlS0tL/0tLS/9LS0v/S0tL/ktL
-        S/VLS0tzS0tL6UtLS+lLS0tzS0tL9UtLS/5LS0v/S0tL/0tLS/9LS0vlS0tLqktLS/9LS0v/S0tL/0tL
-        S/9LS0v2S0tLc0tLS+hLS0voS0tLc0tLS/ZLS0v/S0tL/0tLS/9LS0v/S0tLqktLS0xLS0vuS0tL/0tL
-        S/9LS0v/S0tL/ktLS4NLS0ugS0tLoEtLS4NLS0v+S0tL/0tLS/9LS0v/S0tL7ktLS0xLS0sHS0tLlUtL
-        S/9LS0v/S0tL/0tLS/9LS0vmS0tLkktLS5JLS0vmS0tL/0tLS/9LS0v/S0tL/0tLS5VLS0sHS0tLAEtL
-        SxpLS0uzS0tL/0tLS/9LS0v/S0tL/0tLS/9LS0v/S0tL/0tLS/9LS0v/S0tL/0tLS7NLS0saS0tLAEtL
-        SwBLS0sAS0tLGktLS5VLS0vwS0tL/0tLS/9LS0v/S0tL/0tLS/9LS0v/S0tL8EtLS5VLS0saS0tLAEtL
-        SwAAAAAAAAAAAEtLSwBLS0sHS0tLS0tLS6tLS0vmS0tL/EtLS/xLS0vmS0tLq0tLS0tLS0sHS0tLAAAA
-        AAAAAAAA4AcAAMADAACAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAB
-        AADAAwAA4AcAAA==
-</value>
-  </data>
   <metadata name="$this.TrayLargeIcon" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
