@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Windows.Forms;
 using triggerCam.Camera;
 using triggerCam.Settings;
 using triggerCam;
@@ -16,10 +20,14 @@ namespace triggerCam.UDP
 		private string udpToIP;
 		private int udpToPort;
 		private triggerCam.TrayIcon? trayIcon;
-
 		// モード定数
 		private const int MODE_IMAGE = 0;
-		private const int MODE_VIDEO = 1; public CommandProcessor(UdpClient udpClient, string udpToIP, int udpToPort, CameraRecorder cameraRecorder, triggerCam.TrayIcon? trayIcon)
+		private const int MODE_VIDEO = 1;
+
+		// 録画状態
+		private bool isRecording = false;
+
+		public CommandProcessor(UdpClient udpClient, string udpToIP, int udpToPort, CameraRecorder cameraRecorder, triggerCam.TrayIcon? trayIcon)
 		{
 			this.cameraRecorder = cameraRecorder;
 			this.udpClient = udpClient;
@@ -180,9 +188,9 @@ namespace triggerCam.UDP
 							SendResponse(new ResponseData
 							{
 								status = "success",
-								message = "Snapshot taken",
+								message = "SnapSaved",
 								data = new Dictionary<string, object> {
-																		{ "fileName", fileName }
+																		{ "path", fileName }
 																}
 							});
 						}
@@ -225,10 +233,10 @@ namespace triggerCam.UDP
 								SendResponse(new ResponseData
 								{
 									status = "success",
-									message = "Recording started",
+									message = "RecStart",
 									data = new Dictionary<string, object> {
-																				{ "fileName", fileName }
-																		}
+										{ "path", fileName },
+									}
 								});
 
 								// TrayIconの録画状態を更新
@@ -254,7 +262,7 @@ namespace triggerCam.UDP
 							SendResponse(new ResponseData
 							{
 								status = "success",
-								message = "Recording stopped"
+								message = "RecStop"
 							});
 
 							// TrayIconの録画状態を更新
@@ -265,6 +273,7 @@ namespace triggerCam.UDP
 							SendResponse(new ResponseData { status = "error", message = "Not recording" });
 						}
 						break;
+
 					case "set_resolution":
 						try
 						{
@@ -280,9 +289,9 @@ namespace triggerCam.UDP
 								status = "info",
 								message = "解像度は自動的に取得されるため設定できません",
 								data = new Dictionary<string, object> {
-																		{ "resolution", resolution },
-																		{ "note", "カメラの実際の解像度が自動的に使用されます" }
-																}
+									{ "resolution", resolution },
+									{ "note", "カメラの実際の解像度が自動的に使用されます" }
+								}
 							});
 						}
 						catch (Exception ex)
@@ -306,9 +315,9 @@ namespace triggerCam.UDP
 								status = "info",
 								message = "フレームレートは自動的に取得されるため設定できません",
 								data = new Dictionary<string, object> {
-																		{ "frameRate", fps },
-																		{ "note", "カメラの実際のフレームレートが自動的に使用されます" }
-																}
+									{ "frameRate", fps },
+									{ "note", "カメラの実際のフレームレートが自動的に使用されます" }
+								}
 							});
 						}
 						catch (Exception ex)
@@ -334,6 +343,9 @@ namespace triggerCam.UDP
 							var settings = AppSettings.Instance;
 							settings.VideoCodec = codec;
 
+							// 設定を保存
+							settings.Save();
+
 							// TrayIconのUIを更新
 							trayIcon?.UpdateSettings();
 
@@ -342,8 +354,8 @@ namespace triggerCam.UDP
 								status = "success",
 								message = "Video codec updated",
 								data = new Dictionary<string, object> {
-																		{ "codec", codec }
-																}
+									{ "codec", codec }
+								}
 							});
 						}
 						catch (Exception ex)
@@ -374,6 +386,9 @@ namespace triggerCam.UDP
 							var settings = AppSettings.Instance;
 							settings.ImageQuality = quality;
 
+							// 設定を保存
+							settings.Save();
+
 							// TrayIconのUIを更新
 							trayIcon?.UpdateSettings();
 
@@ -382,8 +397,8 @@ namespace triggerCam.UDP
 								status = "success",
 								message = "Image quality updated",
 								data = new Dictionary<string, object> {
-																		{ "quality", quality }
-																}
+									{ "quality", quality }
+								}
 							});
 						}
 						catch (Exception ex)
@@ -415,6 +430,9 @@ namespace triggerCam.UDP
 							var settings = AppSettings.Instance;
 							settings.ImageFormat = format;
 
+							// 設定を保存
+							settings.Save();
+
 							// TrayIconのUIを更新
 							trayIcon?.UpdateSettings();
 
@@ -423,8 +441,8 @@ namespace triggerCam.UDP
 								status = "success",
 								message = "Image format updated",
 								data = new Dictionary<string, object> {
-																		{ "format", format }
-																}
+									{ "format", format }
+								}
 							});
 						}
 						catch (Exception ex)
@@ -477,6 +495,7 @@ namespace triggerCam.UDP
 								SendResponse(new ResponseData { status = "error", message = "Invalid mode. Use 'image' or 'video'" });
 								break;
 							}
+
 							// モードを更新
 							if (trayIcon != null)
 							{
@@ -485,13 +504,17 @@ namespace triggerCam.UDP
 								// CameraRecorderのモードも更新
 								cameraRecorder.CaptureMode = modeIndex;
 
+								// 設定を保存
+								var settings = AppSettings.Instance;
+								settings.Save();
+
 								SendResponse(new ResponseData
 								{
 									status = "success",
 									message = "Mode updated",
 									data = new Dictionary<string, object> {
-																				{ "mode", modeIndex == MODE_IMAGE ? "image" : "video" }
-																		}
+										{ "mode", modeIndex == MODE_IMAGE ? "image" : "video" }
+									}
 								});
 							}
 							else
@@ -517,9 +540,6 @@ namespace triggerCam.UDP
 			}
 		}
 
-		// 録画状態
-		private bool isRecording = false;
-
 		/// <summary>
 		/// 録画中かどうかを取得する
 		/// </summary>
@@ -528,16 +548,16 @@ namespace triggerCam.UDP
 		{
 			return isRecording;
 		}
-
 		/// <summary>
 		/// 録画を開始する
 		/// </summary>
 		/// <param name="fileName">録画ファイル名（拡張子なし）</param>
-		private void StartRecording(string fileName)
+		/// <param name="customPath">カスタム保存ディレクトリ（指定された場合）</param>
+		private void StartRecording(string fileName, string? customPath = null)
 		{
 			if (!isRecording)
 			{
-				cameraRecorder.StartRecording(fileName);
+				cameraRecorder.StartRecording(fileName, customPath);
 				isRecording = true;
 			}
 		}
@@ -603,7 +623,6 @@ namespace triggerCam.UDP
 			return c == '{' || c == '[' || c == '"' || char.IsWhiteSpace(c);
 		}
 	}
-
 	/// <summary>
 	/// コマンドデータ
 	/// </summary>

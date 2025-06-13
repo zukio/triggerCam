@@ -40,7 +40,7 @@ namespace triggerCam
 			this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
 			this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
-			this.contextMenu_udpEnabled = new UdpEnabledToolStripItem();
+			this.contextMenu_udpSettings = new UdpSettingsToolStripItem();
 			this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
 			this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
 			this.contextMenu_codecContainer = new HorizontalLayoutToolStripItem("動画コーデック:", 100);
@@ -64,7 +64,7 @@ namespace triggerCam
 																												this.contextMenu_codecContainer,
 																												this.contextMenu_recordingStatus,
 																												this.contextMenu_openRecordingsDir,
-																												this.contextMenu_udpEnabled,
+																												this.contextMenu_udpSettings,
 																												this.contextMenu_cameraSettingsSeparator,
 																												this.contextMenu_save,
 																												this.contextMenu_exit
@@ -166,8 +166,8 @@ namespace triggerCam
 			//
 			// contextMenu_udpEnabled
 			//
-			this.contextMenu_udpEnabled.Name = "contextMenu_udpEnabled";
-			this.contextMenu_udpEnabled.Size = new Size(271, 30);
+			this.contextMenu_udpSettings.Name = "contextMenu_udpSettings";
+			this.contextMenu_udpSettings.Size = new Size(271, 30);
 			//
 			// contextMenu_save
 			//
@@ -212,7 +212,7 @@ namespace triggerCam
 		private ToolStripMenuItem contextMenu_recordingsDirLabel;
 		private RecordingPathToolStripItem contextMenu_recordingsPath;
 		private ToolStripMenuItem contextMenu_openRecordingsDir;
-		private UdpEnabledToolStripItem contextMenu_udpEnabled;
+		private UdpSettingsToolStripItem contextMenu_udpSettings;
 		private ToolStripSeparator contextMenu_cameraSettingsSeparator;
 		private ToolStripMenuItem contextMenu_recordingStatus;
 		private HorizontalLayoutToolStripItem contextMenu_imageFormatContainer;

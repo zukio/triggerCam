@@ -83,16 +83,26 @@ namespace triggerCam.Camera
 				SnapshotSaved?.Invoke(path);
 			}
 		}
-
 		/// <summary>
 		/// 動画の録画を開始
 		/// </summary>
-		public void StartRecording(string fileName)
+		/// <param name="fileName">録画ファイル名（拡張子なし）</param>
+		/// <param name="customPath">カスタム保存ディレクトリ（指定された場合はsaveDirectoryより優先）</param>
+		public void StartRecording(string fileName, string? customPath = null)
 		{
 			if (isRecording) return;
 			EnsureCapture();
 
-			string path = Path.Combine(saveDirectory, fileName + ".mp4");
+			// カスタムパスが指定されている場合は使用、なければデフォルトパスを使用
+			string saveDir = customPath ?? saveDirectory;
+
+			// ディレクトリが存在しない場合は作成
+			if (!string.IsNullOrEmpty(saveDir) && !Directory.Exists(saveDir))
+			{
+				Directory.CreateDirectory(saveDir);
+			}
+
+			string path = Path.Combine(saveDir, fileName + ".mp4");
 
 			// FourCCコードを取得
 			var fourCC = GetFourCC(videoCodec);
