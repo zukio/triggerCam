@@ -41,7 +41,6 @@ namespace triggerCam
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
 			this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
 			this.contextMenu_udpEnabled = new UdpEnabledToolStripItem();
-			this.contextMenu_address = new ToolStripTextBox();
 			this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
 			this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
 			this.contextMenu_codecContainer = new HorizontalLayoutToolStripItem("動画コーデック:", 100);
@@ -61,7 +60,6 @@ namespace triggerCam
 																												this.contextMenu_cameraControlsContainer,
 																												this.contextMenu_recordingsDirLabel,
 																												this.contextMenu_recordingsPath,
-                                                        // this.contextMenu_address,
 																												this.contextMenu_imageFormatContainer,
 																												this.contextMenu_codecContainer,
 																												this.contextMenu_recordingStatus,
@@ -132,13 +130,6 @@ namespace triggerCam
 			this.contextMenu_recordingsPath.Path = "Recordings";
 			this.contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
 			this.contextMenu_recordingsPath.BrowseClicked += contextMenu_browseRecordingsDir_Click;
-			// 
-			// contextMenu_address
-			// 
-			this.contextMenu_address.AutoCompleteCustomSource.AddRange(new string[] { "127.0.0.1:10000" });
-			this.contextMenu_address.Name = "contextMenu_address";
-			this.contextMenu_address.Size = new Size(271, 35);
-			this.contextMenu_address.Text = "127.0.0.1:10000";
 			//
 			// contextMenu_cameraSettingsSeparator
 			//
@@ -218,7 +209,6 @@ namespace triggerCam
 		private ToolStripMenuItem contextMenu_save;
 		private ToolStripMenuItem contextMenu_exit;
 		private NotifyIcon notifyIcon1;
-		private ToolStripTextBox contextMenu_address;
 		private ToolStripMenuItem contextMenu_recordingsDirLabel;
 		private RecordingPathToolStripItem contextMenu_recordingsPath;
 		private ToolStripMenuItem contextMenu_openRecordingsDir;
