@@ -11,397 +11,425 @@ using triggerCam.UDP;
 
 namespace triggerCam
 {
-    internal static class Program
-    {
-        private static SerialTriggerListener? serialListener;
-        private static CameraRecorder? cameraRecorder;
-        private static UdpClient? udpClient;
-        private static UDPServer? udpServer;
-        private static CommandProcessor? commandProcessor;
-        private static TrayIcon? trayIcon;
-        private static System.Windows.Forms.Timer? udpTimer;
-        private static System.Windows.Forms.Timer? recordingTimeoutTimer;
-        private static string snapshotSource = "success";
-        private static string recordSource = "success";
-        private static string udpToIP = "127.0.0.1";
-        private static int udpToPort = 10000;
-        private static string udpListenIP = "127.0.0.1";
-        private static int udpListenPort = 10001;
-        private static int recordingTimeoutMinutes = 10;
-        private static Mutex? appMutex;
+	internal static class Program
+	{
+		private static SerialTriggerListener? serialListener;
+		private static CameraRecorder? cameraRecorder;
+		private static UdpClient? udpClient;
+		private static UDPServer? udpServer;
+		private static CommandProcessor? commandProcessor;
+		private static TrayIcon? trayIcon;
+		private static System.Windows.Forms.Timer? udpTimer;
+		private static System.Windows.Forms.Timer? recordingTimeoutTimer;
+		private static string snapshotSource = "success";
+		private static string recordSource = "success";
+		private static string udpToIP = "127.0.0.1";
+		private static int udpToPort = 10000;
+		private static string udpListenIP = "127.0.0.1";
+		private static int udpListenPort = 10001;
+		private static int recordingTimeoutMinutes = 10;
+		private static Mutex? appMutex;
 
-        [STAThread]
-        static void Main(string[] args)
-        {
-            bool createdNew;
-            appMutex = new Mutex(true, "triggerCamAppMutex", out createdNew);
-            if (!createdNew)
-            {
-                MessageBox.Show(
-                    "すでに起動中です",
-                    "triggerCam",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
+		[STAThread]
+		static void Main(string[] args)
+		{
+			bool createdNew;
+			appMutex = new Mutex(true, "triggerCamAppMutex", out createdNew);
+			if (!createdNew)
+			{
+				MessageBox.Show(
+						"すでに起動中です",
+						"triggerCam",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Information);
+				return;
+			}
 
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                MessageBox.Show(
-                    "Serial features are only available on Windows.",
-                    "Platform Not Supported",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				MessageBox.Show(
+						"Serial features are only available on Windows.",
+						"Platform Not Supported",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Information);
+				return;
+			}
 
-            // Initialize log redirection
-            var consoleSaver = triggerCam.LogWriter.SaveConsole.Instance;
-            
-            var settings = AppSettings.Instance;
-            recordingTimeoutMinutes = settings.RecordingTimeoutMinutes;
-            
-            // コマンドライン引数の処理
-            ProcessCommandLineArgs(args, settings);
-            
-            // UDP送信先の設定
-            ParseUdpAddress(settings.UdpToAddress, out udpToIP, out udpToPort);
-            
-            // UDP受信の設定
-            ParseUdpAddress(settings.UdpListenAddress, out udpListenIP, out udpListenPort);
-            
-            // カメラレコーダーの初期化
-            cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
-            cameraRecorder.SnapshotSaved += path =>
-            {
-                var data = new Dictionary<string, object> { { "path", path } };
-                Notify(snapshotSource, "SnapSaved", data);
-            };
-            cameraRecorder.VideoSaved += path =>
-            {
-                var data = new Dictionary<string, object> { { "path", path } };
-                Notify(recordSource, "RecStop", data);
-                trayIcon?.UpdateRecordingState(false);
-            };
-            
-            // カメラをセットアップして実際の解像度とフレームレートを取得
-            cameraRecorder.SetupCamera();
-            var camName = GetCameraName(settings.CameraIndex);
-            var conData = new Dictionary<string, object>
-            {
-                { "id", settings.CameraIndex },
-                { "name", camName }
-            };
-            Notify("success", "Connected", conData);
+			// Initialize log redirection
+			var consoleSaver = triggerCam.LogWriter.SaveConsole.Instance;
 
-            // シリアルトリガーリスナーの初期化
-            serialListener = new SerialTriggerListener(settings.ComPort, settings.BaudRate);
-            serialListener.SnapReceived += () =>
-            {
-                SetSnapshotSource("serial");
-                cameraRecorder!.TakeSnapshot(CreateFileName());
-            };
-            serialListener.StartReceived += () =>
-            {
-                SetRecordSource("serial");
-                cameraRecorder!.StartRecording(CreateFileName());
-                Notify("serial", "RecStart");
-                trayIcon?.UpdateRecordingState(true);
-                StartRecordingTimeout();
-            };
-            serialListener.StopReceived += () =>
-            {
-                SetRecordSource("serial");
-                cameraRecorder!.StopRecording();
-                StopRecordingTimeout();
-            };
+			var settings = AppSettings.Instance;
+			recordingTimeoutMinutes = settings.RecordingTimeoutMinutes;
 
-            serialListener.Start();
+			// コマンドライン引数の処理
+			ProcessCommandLineArgs(args, settings);
 
-            ApplicationConfiguration.Initialize();
-            
-            // タスクトレイアイコンの初期化
-            trayIcon = new TrayIcon();
+			// UDP送信先の設定
+			ParseUdpAddress(settings.UdpToAddress, out udpToIP, out udpToPort);
 
-            if (settings.UdpEnabled)
-            {
-                StartUdpServices();
-            }
+			// UDP受信の設定
+			ParseUdpAddress(settings.UdpListenAddress, out udpListenIP, out udpListenPort);
 
-            Application.ApplicationExit += (s, e) =>
-            {
-                StopUdpServices();
-                serialListener?.Dispose();
-                cameraRecorder?.Dispose();
-                triggerCam.LogWriter.SaveConsole.Instance.Dispose();
-                Notify("success", "disConnected");
-                appMutex?.ReleaseMutex();
-                appMutex?.Dispose();
-            };
+			// カメラレコーダーの初期化
+			cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
+			cameraRecorder.SnapshotSaved += path =>
+			{
+				var data = new Dictionary<string, object> { { "path", path } };
+				Notify(snapshotSource, "SnapSaved", data);
+			};
+			cameraRecorder.VideoSaved += path =>
+			{
+				var data = new Dictionary<string, object> { { "path", path } };
+				Notify(recordSource, "RecStop", data);
+				trayIcon?.UpdateRecordingState(false);
+			};
 
-            Application.Run();
-        }
+			// カメラをセットアップして実際の解像度とフレームレートを取得
+			cameraRecorder.SetupCamera();
+			var camName = GetCameraName(settings.CameraIndex);
+			var conData = new Dictionary<string, object>
+						{
+								{ "id", settings.CameraIndex },
+								{ "name", camName }
+						};
+			Notify("success", "Connected", conData);
 
-        private static void SendUdp(string message)
-        {
-            if (udpClient != null && AppSettings.Instance.UdpEnabled)
-            {
-                UDPSender.SendUDP(udpClient, message, udpToIP, udpToPort);
-            }
-        }
+			// シリアルトリガーリスナーの初期化
+			serialListener = new SerialTriggerListener(settings.ComPort, settings.BaudRate);
+			serialListener.SnapReceived += () =>
+			{
+				SetSnapshotSource("serial");
+				cameraRecorder!.TakeSnapshot(CreateFileName());
+			};
+			serialListener.StartReceived += () =>
+			{
+				SetRecordSource("serial");
+				cameraRecorder!.StartRecording(CreateFileName());
+				Notify("serial", "RecStart");
+				trayIcon?.UpdateRecordingState(true);
+				StartRecordingTimeout();
+			};
+			serialListener.StopReceived += () =>
+			{
+				SetRecordSource("serial");
+				cameraRecorder!.StopRecording();
+				StopRecordingTimeout();
+			};
 
-        public static void SetSnapshotSource(string src) => snapshotSource = src;
-        public static void SetRecordSource(string src) => recordSource = src;
+			serialListener.Start();
 
-        public static void Notify(string status, string message, Dictionary<string, object>? data = null)
-        {
-            if (udpClient != null && AppSettings.Instance.UdpEnabled)
-            {
-                UdpNotifier.SendStatus(udpClient, udpToIP, udpToPort, status, message, data);
-            }
-        }
+			ApplicationConfiguration.Initialize();
 
-        private static string GetCameraName(int index)
-        {
-            try
-            {
-                var devices = new List<DsDevice>(DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice));
-                if (index >= 0 && index < devices.Count)
-                {
-                    return devices[index].Name;
-                }
-            }
-            catch (Exception ex)
-            {
-                global::LogWriter.AddErrorLog(ex, nameof(GetCameraName));
-            }
-            return $"Camera {index}";
-        }
+			// タスクトレイアイコンの初期化
+			trayIcon = new TrayIcon();
 
-        private static void ParseUdpAddress(string address, out string ip, out int port)
-        {
-            ip = "127.0.0.1";
-            port = 10000;
-            if (!string.IsNullOrEmpty(address))
-            {
-                var parts = address.Split(':');
-                if (parts.Length == 2 && int.TryParse(parts[1], out int p))
-                {
-                    ip = parts[0];
-                    port = p;
-                }
-            }
-        }
+			if (settings.UdpEnabled)
+			{
+				StartUdpServices();
+			}
+			Application.ApplicationExit += (s, e) =>
+			{
+				// CleanupBeforeExitから呼び出されていない場合のみクリーンアップを実行
+				if (udpServer != null || serialListener != null || cameraRecorder != null)
+				{
+					StopUdpServices();
+					serialListener?.Dispose();
+					cameraRecorder?.Dispose();
+					Notify("success", "disConnected");
+				}
 
-        private static string CreateFileName() => DateTime.Now.ToString("yyyyMMdd_HHmmss");
+				// 常に実行する必要のあるクリーンアップ処理
+				triggerCam.LogWriter.SaveConsole.Instance.Dispose();
+				appMutex?.ReleaseMutex();
+				appMutex?.Dispose();
+			};
 
-        private static void StartUdpServices()
-        {
-            if (udpClient != null)
-                return;
+			Application.Run();
+		}
 
-            udpClient = new UdpClient();
-            udpServer = new UDPServer(udpListenIP, udpListenPort);
-            commandProcessor = new CommandProcessor(
-                udpClient,
-                udpToIP,
-                udpToPort,
-                cameraRecorder!,
-                trayIcon!);
+		private static void SendUdp(string message)
+		{
+			if (udpClient != null && AppSettings.Instance.UdpEnabled)
+			{
+				UDPSender.SendUDP(udpClient, message, udpToIP, udpToPort);
+			}
+		}
 
-            udpTimer = new System.Windows.Forms.Timer
-            {
-                Interval = 100
-            };
+		public static void SetSnapshotSource(string src) => snapshotSource = src;
+		public static void SetRecordSource(string src) => recordSource = src;
 
-            udpTimer.Tick += (sender, e) =>
-            {
-                while (UDPServer_Static.q_UdpData.TryDequeue(out UDP_DATA? data))
-                {
-                    if (data != null)
-                    {
-                        commandProcessor?.ProcessCommand(data);
-                    }
-                }
-            };
+		public static void Notify(string status, string message, Dictionary<string, object>? data = null)
+		{
+			if (udpClient != null && AppSettings.Instance.UdpEnabled)
+			{
+				UdpNotifier.SendStatus(udpClient, udpToIP, udpToPort, status, message, data);
+			}
+		}
 
-            udpTimer.Start();
-        }
+		private static string GetCameraName(int index)
+		{
+			try
+			{
+				var devices = new List<DsDevice>(DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice));
+				if (index >= 0 && index < devices.Count)
+				{
+					return devices[index].Name;
+				}
+			}
+			catch (Exception ex)
+			{
+				global::LogWriter.AddErrorLog(ex, nameof(GetCameraName));
+			}
+			return $"Camera {index}";
+		}
 
-        private static void StopUdpServices()
-        {
-            udpTimer?.Stop();
-            udpTimer?.Dispose();
-            udpTimer = null;
+		private static void ParseUdpAddress(string address, out string ip, out int port)
+		{
+			ip = "127.0.0.1";
+			port = 10000;
+			if (!string.IsNullOrEmpty(address))
+			{
+				var parts = address.Split(':');
+				if (parts.Length == 2 && int.TryParse(parts[1], out int p))
+				{
+					ip = parts[0];
+					port = p;
+				}
+			}
+		}
 
-            udpClient?.Dispose();
-            udpClient = null;
+		private static string CreateFileName() => DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
-            udpServer?.Dispose();
-            udpServer = null;
+		private static void StartUdpServices()
+		{
+			if (udpClient != null)
+				return;
 
-            commandProcessor = null;
-        }
+			udpClient = new UdpClient();
+			udpServer = new UDPServer(udpListenIP, udpListenPort);
+			commandProcessor = new CommandProcessor(
+					udpClient,
+					udpToIP,
+					udpToPort,
+					cameraRecorder!,
+					trayIcon!);
 
-        public static void UpdateUdpEnabled(bool enabled)
-        {
-            var settings = AppSettings.Instance;
-            settings.UdpEnabled = enabled;
+			udpTimer = new System.Windows.Forms.Timer
+			{
+				Interval = 100
+			};
 
-            if (enabled)
-            {
-                StartUdpServices();
-            }
-            else
-            {
-                StopUdpServices();
-            }
-        }
+			udpTimer.Tick += (sender, e) =>
+			{
+				while (UDPServer_Static.q_UdpData.TryDequeue(out UDP_DATA? data))
+				{
+					if (data != null)
+					{
+						commandProcessor?.ProcessCommand(data);
+					}
+				}
+			};
 
-        /// <summary>
-        /// コマンドライン引数を処理する
-        /// </summary>
-        /// <param name="args">コマンドライン引数</param>
-        /// <param name="settings">アプリケーション設定</param>
-        private static void ProcessCommandLineArgs(string[] args, AppSettings settings)
-        {
-            if (args == null || args.Length == 0)
-                return;
+			udpTimer.Start();
+		}
+		private static void StopUdpServices()
+		{
+			udpTimer?.Stop();
+			udpTimer?.Dispose();
+			udpTimer = null;
 
-            for (int i = 0; i < args.Length; i++)
-            {
-                string arg = args[i].ToLower();
-                if (i + 1 < args.Length)
-                {
-                    string value = args[i + 1];
+			udpClient?.Dispose();
+			udpClient = null;
 
-                    switch (arg)
-                    {
-                        case "--com":
-                        case "-c":
-                            settings.ComPort = value;
-                            i++;
-                            break;
+			udpServer?.Dispose();
+			udpServer = null;
 
-                        case "--baud":
-                        case "-b":
-                            if (int.TryParse(value, out int baudRate))
-                            {
-                                settings.BaudRate = baudRate;
-                            }
-                            i++;
-                            break;
+			commandProcessor = null;
+		}
 
-                        case "--camera":
-                        case "-cam":
-                            if (int.TryParse(value, out int cameraIndex))
-                            {
-                                settings.CameraIndex = cameraIndex;
-                            }
-                            i++;
-                            break;                        case "--resolution":
-                        case "-r":
-                            // 解像度はカメラから自動的に取得されるため、このコマンドは無視されます
-                            Console.WriteLine("注意: 解像度はカメラから自動的に取得されるようになりました。この設定は無視されます。");
-                            i++;
-                            break;
+		/// <summary>
+		/// アプリケーション終了前にリソースを安全にクリーンアップします
+		/// </summary>
+		public static void CleanupBeforeExit()
+		{
+			// UDPサーバーを停止
+			StopUdpServices();
 
-                        case "--fps":
-                        case "-f":
-                            // フレームレートはカメラから自動的に取得されるため、このコマンドは無視されます
-                            Console.WriteLine("注意: フレームレートはカメラから自動的に取得されるようになりました。この設定は無視されます。");
-                            i++;
-                            break;
+			// シリアルリスナーを停止
+			serialListener?.Dispose();
+			serialListener = null;
 
-                        case "--codec":
-                            settings.VideoCodec = value.ToUpper();
-                            i++;
-                            break;
+			// カメラレコーダーを停止
+			cameraRecorder?.Dispose();
+			cameraRecorder = null;
 
-                        case "--quality":
-                        case "-q":
-                            if (int.TryParse(value, out int quality) && quality >= 1 && quality <= 100)
-                            {
-                                settings.ImageQuality = quality;
-                            }
-                            i++;
-                            break;
+			// 少し待機して、実行中のコールバックが完了するのを待つ
+			Thread.Sleep(200);
 
-                        case "--format":
-                            settings.ImageFormat = value.ToLower();
-                            i++;
-                            break;
+			// ログ記録を停止（このタイミングで安全にDisposeできる）
+			Notify("success", "disConnected");
+		}
 
-                        case "--dir":
-                        case "-d":
-                            if (Directory.Exists(value) || Directory.Exists(Path.GetDirectoryName(value)))
-                            {
-                                settings.CameraSaveDirectory = value;
-                                Directory.CreateDirectory(value);
-                            }
-                            i++;
-                            break;
+		public static void UpdateUdpEnabled(bool enabled)
+		{
+			var settings = AppSettings.Instance;
+			settings.UdpEnabled = enabled;
 
-                        case "--udpout":
-                            settings.UdpToAddress = value;
-                            i++;
-                            break;
+			if (enabled)
+			{
+				StartUdpServices();
+			}
+			else
+			{
+				StopUdpServices();
+			}
+		}
 
-                        case "--udpin":
-                            settings.UdpListenAddress = value;
-                            i++;
-                            break;
+		/// <summary>
+		/// コマンドライン引数を処理する
+		/// </summary>
+		/// <param name="args">コマンドライン引数</param>
+		/// <param name="settings">アプリケーション設定</param>
+		private static void ProcessCommandLineArgs(string[] args, AppSettings settings)
+		{
+			if (args == null || args.Length == 0)
+				return;
 
-                        case "--udp":
-                            if (bool.TryParse(value, out bool udpFlag))
-                            {
-                                settings.UdpEnabled = udpFlag;
-                            }
-                            i++;
-                            break;
+			for (int i = 0; i < args.Length; i++)
+			{
+				string arg = args[i].ToLower();
+				if (i + 1 < args.Length)
+				{
+					string value = args[i + 1];
 
-                        case "--timeout":
-                        case "-t":
-                            if (int.TryParse(value, out int to))
-                            {
-                                settings.RecordingTimeoutMinutes = to;
-                                recordingTimeoutMinutes = to;
-                            }
-                            i++;
-                            break;
+					switch (arg)
+					{
+						case "--com":
+						case "-c":
+							settings.ComPort = value;
+							i++;
+							break;
 
-                        case "--save":
-                        case "-s":
-                            // 設定を保存する場合
-                            if (value.ToLower() == "true" || value == "1")
-                            {
-                                settings.Save();
-                            }
-                            i++;
-                            break;
-                    }
-                }
-                else if (arg == "--help" || arg == "-h" || arg == "/?")
-                {
-                    // ヘルプメッセージを表示
-                    ShowHelpMessage();
-                    Environment.Exit(0);
-                }
-                else if (arg == "--version" || arg == "-v")
-                {
-                    // バージョン情報を表示
-                    MessageBox.Show($"Camera Recorder v1.0", "バージョン情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Environment.Exit(0);
-                }
-            }
-        }
+						case "--baud":
+						case "-b":
+							if (int.TryParse(value, out int baudRate))
+							{
+								settings.BaudRate = baudRate;
+							}
+							i++;
+							break;
 
-        /// <summary>
-        /// ヘルプメッセージを表示
-        /// </summary>
-        private static void ShowHelpMessage()
-        {
-            string helpMessage = @"カメラレコーダー コマンドライン引数:
+						case "--camera":
+						case "-cam":
+							if (int.TryParse(value, out int cameraIndex))
+							{
+								settings.CameraIndex = cameraIndex;
+							}
+							i++;
+							break;
+						case "--resolution":
+						case "-r":
+							// 解像度はカメラから自動的に取得されるため、このコマンドは無視されます
+							Console.WriteLine("注意: 解像度はカメラから自動的に取得されるようになりました。この設定は無視されます。");
+							i++;
+							break;
+
+						case "--fps":
+						case "-f":
+							// フレームレートはカメラから自動的に取得されるため、このコマンドは無視されます
+							Console.WriteLine("注意: フレームレートはカメラから自動的に取得されるようになりました。この設定は無視されます。");
+							i++;
+							break;
+
+						case "--codec":
+							settings.VideoCodec = value.ToUpper();
+							i++;
+							break;
+
+						case "--quality":
+						case "-q":
+							if (int.TryParse(value, out int quality) && quality >= 1 && quality <= 100)
+							{
+								settings.ImageQuality = quality;
+							}
+							i++;
+							break;
+
+						case "--format":
+							settings.ImageFormat = value.ToLower();
+							i++;
+							break;
+
+						case "--dir":
+						case "-d":
+							if (Directory.Exists(value) || Directory.Exists(Path.GetDirectoryName(value)))
+							{
+								settings.CameraSaveDirectory = value;
+								Directory.CreateDirectory(value);
+							}
+							i++;
+							break;
+
+						case "--udpout":
+							settings.UdpToAddress = value;
+							i++;
+							break;
+
+						case "--udpin":
+							settings.UdpListenAddress = value;
+							i++;
+							break;
+
+						case "--udp":
+							if (bool.TryParse(value, out bool udpFlag))
+							{
+								settings.UdpEnabled = udpFlag;
+							}
+							i++;
+							break;
+
+						case "--timeout":
+						case "-t":
+							if (int.TryParse(value, out int to))
+							{
+								settings.RecordingTimeoutMinutes = to;
+								recordingTimeoutMinutes = to;
+							}
+							i++;
+							break;
+
+						case "--save":
+						case "-s":
+							// 設定を保存する場合
+							if (value.ToLower() == "true" || value == "1")
+							{
+								settings.Save();
+							}
+							i++;
+							break;
+					}
+				}
+				else if (arg == "--help" || arg == "-h" || arg == "/?")
+				{
+					// ヘルプメッセージを表示
+					ShowHelpMessage();
+					Environment.Exit(0);
+				}
+				else if (arg == "--version" || arg == "-v")
+				{
+					// バージョン情報を表示
+					MessageBox.Show($"Camera Recorder v1.0", "バージョン情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					Environment.Exit(0);
+				}
+			}
+		}
+
+		/// <summary>
+		/// ヘルプメッセージを表示
+		/// </summary>
+		private static void ShowHelpMessage()
+		{
+			string helpMessage = @"カメラレコーダー コマンドライン引数:
 
 基本設定:
   --com, -c <ポート名>        シリアルポートを指定 (例: COM1)
@@ -431,54 +459,54 @@ namespace triggerCam
 例:
   triggerCam.exe --camera 1 --resolution 1920x1080 --fps 30 --save true
 ";
-            MessageBox.Show(helpMessage, "コマンドライン引数ヘルプ", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
+			MessageBox.Show(helpMessage, "コマンドライン引数ヘルプ", MessageBoxButtons.OK, MessageBoxIcon.Information);
+		}
 
-        private static void ForceStopRecording()
-        {
-            recordingTimeoutTimer?.Stop();
-            recordingTimeoutTimer?.Dispose();
-            recordingTimeoutTimer = null;
+		private static void ForceStopRecording()
+		{
+			recordingTimeoutTimer?.Stop();
+			recordingTimeoutTimer?.Dispose();
+			recordingTimeoutTimer = null;
 
-            if (cameraRecorder != null && cameraRecorder.IsRecording)
-            {
-                MessageBox.Show(
-                    "録画停止トリガーが一定時間内に検出されません。録画を強制終了します。",
-                    "録画強制終了",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+			if (cameraRecorder != null && cameraRecorder.IsRecording)
+			{
+				MessageBox.Show(
+						"録画停止トリガーが一定時間内に検出されません。録画を強制終了します。",
+						"録画強制終了",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Warning);
 
-                SetRecordSource("timeout");
-                cameraRecorder.StopRecording();
-                trayIcon?.UpdateRecordingState(false);
-            }
-        }
+				SetRecordSource("timeout");
+				cameraRecorder.StopRecording();
+				trayIcon?.UpdateRecordingState(false);
+			}
+		}
 
-        public static void StartRecordingTimeout()
-        {
-            StopRecordingTimeout();
-            recordingTimeoutTimer = new System.Windows.Forms.Timer
-            {
-                Interval = recordingTimeoutMinutes * 60 * 1000
-            };
-            recordingTimeoutTimer.Tick += (s, e) => ForceStopRecording();
-            recordingTimeoutTimer.Start();
-        }
+		public static void StartRecordingTimeout()
+		{
+			StopRecordingTimeout();
+			recordingTimeoutTimer = new System.Windows.Forms.Timer
+			{
+				Interval = recordingTimeoutMinutes * 60 * 1000
+			};
+			recordingTimeoutTimer.Tick += (s, e) => ForceStopRecording();
+			recordingTimeoutTimer.Start();
+		}
 
-        public static void StopRecordingTimeout()
-        {
-            recordingTimeoutTimer?.Stop();
-            recordingTimeoutTimer?.Dispose();
-            recordingTimeoutTimer = null;
-        }
+		public static void StopRecordingTimeout()
+		{
+			recordingTimeoutTimer?.Stop();
+			recordingTimeoutTimer?.Dispose();
+			recordingTimeoutTimer = null;
+		}
 
-        /// <summary>
-        /// CameraRecorderのインスタンスを取得する
-        /// </summary>
-        /// <returns>CameraRecorderインスタンス</returns>
-        public static CameraRecorder? GetCameraRecorder()
-        {
-            return cameraRecorder;
-        }
-    }
+		/// <summary>
+		/// CameraRecorderのインスタンスを取得する
+		/// </summary>
+		/// <returns>CameraRecorderインスタンス</returns>
+		public static CameraRecorder? GetCameraRecorder()
+		{
+			return cameraRecorder;
+		}
+	}
 }

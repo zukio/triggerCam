@@ -187,7 +187,8 @@ namespace triggerCam
 			// notifyIcon1
 			// 
 			this.notifyIcon1.ContextMenuStrip = this.context;
-			this.notifyIcon1.Icon = new Icon("assets/icon.ico");
+			string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icon.ico");
+			this.notifyIcon1.Icon = new Icon(iconPath);
 			// this.notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
 			this.notifyIcon1.Text = "Camera Recorder";
 			this.notifyIcon1.Visible = true;

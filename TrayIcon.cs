@@ -247,9 +247,10 @@ namespace triggerCam
 				Directory.CreateDirectory(path);
 			Process.Start("explorer.exe", $"\"{path}\"");
 		}
-
 		private void contextMenu_exit_Click(object sender, EventArgs e)
 		{
+			// UDPServerを先に停止してから終了するようにプログラムを修正
+			Program.CleanupBeforeExit();
 			Application.Exit();
 		}
 
@@ -478,14 +479,14 @@ namespace triggerCam
 			if (cameraRecorder != null && !isRecording)
 			{
 				string fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                               Program.SetRecordSource("manual");
-                               cameraRecorder.StartRecording(fileName);
-                               Program.Notify("manual", "RecStart");
-                               isRecording = true;
-                               UpdateRecordingState(true);
-                               Program.StartRecordingTimeout();
-                        }
-                }
+				Program.SetRecordSource("manual");
+				cameraRecorder.StartRecording(fileName);
+				Program.Notify("manual", "RecStart");
+				isRecording = true;
+				UpdateRecordingState(true);
+				Program.StartRecordingTimeout();
+			}
+		}
 
 		/// <summary>
 		/// STOPボタンクリック時の処理
@@ -496,13 +497,13 @@ namespace triggerCam
 			var cameraRecorder = Program.GetCameraRecorder();
 			if (cameraRecorder != null && isRecording)
 			{
-                               Program.SetRecordSource("manual");
-                               cameraRecorder.StopRecording();
-                               isRecording = false;
-                               UpdateRecordingState(false);
-                               Program.StopRecordingTimeout();
-                        }
-                }
+				Program.SetRecordSource("manual");
+				cameraRecorder.StopRecording();
+				isRecording = false;
+				UpdateRecordingState(false);
+				Program.StopRecordingTimeout();
+			}
+		}
 
 		/// <summary>
 		/// 現在選択されているモードを取得 (0:静止画, 1:動画)
@@ -555,11 +556,11 @@ namespace triggerCam
 					});
 				}
 			}
-                        catch (Exception ex)
-                        {
-                                Console.WriteLine($"カメラデバイス一覧の取得エラー: {ex.Message}");
-                                global::LogWriter.AddErrorLog(ex, "GetCameraDeviceList");
-                        }
+			catch (Exception ex)
+			{
+				Console.WriteLine($"カメラデバイス一覧の取得エラー: {ex.Message}");
+				global::LogWriter.AddErrorLog(ex, "GetCameraDeviceList");
+			}
 
 			// デバイスが見つからない場合はダミーデータを作成
 			if (cameraList.Count == 0)
@@ -583,11 +584,11 @@ namespace triggerCam
 						}
 					}
 				}
-                                catch (Exception ex)
-                                {
-                                        Console.WriteLine($"OpenCVでのカメラ検出エラー: {ex.Message}");
-                                        global::LogWriter.AddErrorLog(ex, "GetCameraDeviceList");
-                                }
+				catch (Exception ex)
+				{
+					Console.WriteLine($"OpenCVでのカメラ検出エラー: {ex.Message}");
+					global::LogWriter.AddErrorLog(ex, "GetCameraDeviceList");
+				}
 			}
 
 			return cameraList;
