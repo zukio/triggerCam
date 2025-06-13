@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using DirectShowLib;
 using OpenCvSharp;
+using triggerCam.Controls;
 using triggerCam.Settings;
 
 namespace triggerCam
@@ -44,10 +45,9 @@ namespace triggerCam
             contextMenu_baudRateSelect.SelectedIndexChanged += OnSettingChanged;
             contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
             contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
-            contextMenu_address.TextChanged += OnAddressChanged;
-            contextMenu_recordingsPath.PathChanged += OnRecordingsDirChanged;
+            contextMenu_udpSettings.AddressChanged += OnAddressChanged;
             contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
-            contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
+            contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
 
             LoadSettings();
             
@@ -107,7 +107,8 @@ namespace triggerCam
             contextMenu_modeContainer.SelectedIndex = 1; // デフォルトは動画モード
             
             contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
-            contextMenu_address.Text = settings.UdpToAddress;
+            contextMenu_udpSettings.Address = settings.UdpToAddress;
+            contextMenu_udpSettings.UdpEnabled = settings.UdpEnabled;
             
             // モードに応じたフォーマット設定の読み込みはUpdateButtonVisibilityで行う
             
@@ -151,7 +152,7 @@ namespace triggerCam
 
         private void OnAddressChanged(object? sender, EventArgs e)
         {
-            if (settings != null && !string.Equals(contextMenu_address.Text, settings.UdpToAddress))
+            if (settings != null && !string.Equals(contextMenu_udpSettings.Address, settings.UdpToAddress))
             {
                 contextMenu_save.Enabled = true;
             }
@@ -198,7 +199,8 @@ namespace triggerCam
             
             settings.CameraIndex = camIdx;
             settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
-            settings.UdpToAddress = contextMenu_address.Text;
+            settings.UdpToAddress = contextMenu_udpSettings.Address;
+            settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
               // モードに応じた設定の保存
             if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
             {
@@ -244,6 +246,12 @@ namespace triggerCam
         private void contextMenu_exit_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void contextMenu_udpSettings_CheckedChanged(object? sender, EventArgs e)
+        {
+            Program.UpdateUdpEnabled(contextMenu_udpSettings.UdpEnabled);
+            contextMenu_save.Enabled = true;
         }
 
         // Called from UDP CommandProcessor
