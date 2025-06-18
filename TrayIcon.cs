@@ -231,6 +231,7 @@ namespace triggerCam
 
                         settings.Save();
                         Program.UpdateSerialSettings(settings);
+                        Program.UpdateCameraSettings(settings);
 
 			var addressParts = settings.UdpToAddress.Split(':');
 			if (addressParts.Length == 2 && int.TryParse(addressParts[1], out int port))
