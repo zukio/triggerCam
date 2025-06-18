@@ -105,10 +105,11 @@ namespace triggerCam
 				contextMenu_cameraSelect.SelectedIndex = 0;
 			}
 
-			// モード設定
-			contextMenu_modeContainer.Items.Clear();
-			contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
-			contextMenu_modeContainer.SelectedIndex = 1; // デフォルトは動画モード
+                        // モード設定
+                        contextMenu_modeContainer.Items.Clear();
+                        contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
+                        int modeIndex = (settings.CaptureMode == 0) ? 0 : 1;
+                        contextMenu_modeContainer.SelectedIndex = modeIndex;
 
 			contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
 			contextMenu_udpSettings.Address = settings.UdpToAddress;
@@ -206,9 +207,12 @@ namespace triggerCam
 			settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
 			settings.UdpToAddress = contextMenu_udpSettings.Address;
 			settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
-			// モードに応じた設定の保存
-			if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
-			{
+                        // 現在のモードを保存
+                        settings.CaptureMode = contextMenu_modeContainer.SelectedIndex;
+
+                        // モードに応じた設定の保存
+                        if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
+                        {
 				// 画像形式の保存
 				settings.ImageFormat = contextMenu_imageFormatContainer.ComboBoxText.ToLower();
 			}

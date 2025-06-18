@@ -70,8 +70,12 @@ namespace triggerCam
 			// UDP受信の設定
 			ParseUdpAddress(settings.UdpListenAddress, out udpListenIP, out udpListenPort);
 
-			// カメラレコーダーの初期化
-			cameraRecorder = new CameraRecorder(settings.CameraIndex, settings.CameraSaveDirectory);
+                        // カメラレコーダーの初期化
+                        cameraRecorder = new CameraRecorder(
+                                        settings.CameraIndex,
+                                        settings.CameraSaveDirectory,
+                                        settings.FrameRate,
+                                        settings.CaptureMode);
 			cameraRecorder.SnapshotSaved += path =>
 			{
 				var data = new Dictionary<string, object> { { "path", path } };

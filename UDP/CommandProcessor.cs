@@ -568,9 +568,10 @@ namespace triggerCam.UDP
 								// CameraRecorderのモードも更新
 								cameraRecorder.CaptureMode = modeIndex;
 
-								// 設定を保存
-								var settings = AppSettings.Instance;
-								settings.Save();
+                                                                // 設定を保存
+                                                                var settings = AppSettings.Instance;
+                                                                settings.CaptureMode = modeIndex;
+                                                                settings.Save();
 
 								SendResponse(new ResponseData
 								{
