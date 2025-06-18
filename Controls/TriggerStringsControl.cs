@@ -76,7 +76,7 @@ namespace triggerCam.Controls
 
             Controls.Add(panel);
             AutoSize = true;
-            MinimumSize = new System.Drawing.Size(250, 30);
+            MinimumSize = new System.Drawing.Size(360, 30);
         }
     }
 
@@ -112,7 +112,7 @@ namespace triggerCam.Controls
         public TriggerStringsToolStripItem() : base(new TriggerStringsControl())
         {
             AutoSize = false;
-            Width = 271;
+            Width = 360;
             Height = 30;
         }
     }
