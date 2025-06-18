@@ -1,0 +1,3 @@
+# setup.shを実行
+chmod +x setup.sh
+./setup.sh
