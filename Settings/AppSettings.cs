@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace triggerCam.Settings
 {
@@ -126,7 +127,8 @@ namespace triggerCam.Settings
 		public int RecordingTimeoutMinutes { get; set; } = 10;
 
 		// コンストラクタ
-		private AppSettings() { }
+                [JsonConstructor]
+                private AppSettings() { }
 
 		/// <summary>
 		/// 設定を読み込む
