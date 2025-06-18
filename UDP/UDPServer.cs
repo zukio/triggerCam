@@ -33,12 +33,15 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
 
         // 非同期受信を開始
         udp.BeginReceive(ReceiveCallback, udp);
+
+        global::LogWriter.AddLog($"UDP server started on {UDP_LocalAddress}:{UDP_LocalPort}");
     }
 
     public void Dispose()
     {
         // UdpClient インスタンスを解放
         udp?.Dispose();
+        global::LogWriter.AddLog($"UDP server closed on port {UDP_LocalPort}");
     }
 
     private void ReceiveCallback(IAsyncResult ar)
@@ -67,12 +70,14 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
             // UDP 受信を再開
             udp.BeginReceive(ReceiveCallback, udp);
 
-            Console.WriteLine($"UDP Received:\n" +
-                $"IP: {data.ip}, Port: {data.port}, Msg: {data.rcvString}");
+            string log = $"UDP Received: IP {data.ip} Port {data.port} >> {data.rcvString}";
+            Console.WriteLine(log);
+            global::LogWriter.AddLog(log);
         }
         catch (Exception error)
         {
             Console.WriteLine(error.Message, "Receive UDP Data");
+            global::LogWriter.AddLog($"UDP receive error: {error.Message}");
             global::LogWriter.AddErrorLog(error, nameof(ReceiveCallback));
         }
     }

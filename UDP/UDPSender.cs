@@ -21,7 +21,9 @@ public static class UDPSender
             // UDP を非同期送信
             udpClient.SendAsync(bytes, bytes.Length, ip, port);
 
-            Console.WriteLine($"Send UDP to: {ip}:{port}\n  >>Data: {data}");
+            string log = $"Send UDP to: {ip}:{port} >> {data}";
+            Console.WriteLine(log);
+            global::LogWriter.AddLog(log);
         }
     }
 
@@ -39,6 +41,8 @@ public static class UDPSender
         // UDP を非同期送信
         udpClient.SendAsync(bytes, bytes.Length, ip, port);
 
-        Console.WriteLine($"Send UDP to: {ip}:{port}\n  >>Data: {data}");
+        string log = $"Send UDP to: {ip}:{port} >> {data}";
+        Console.WriteLine(log);
+        global::LogWriter.AddLog(log);
     }
 }
