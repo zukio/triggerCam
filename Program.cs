@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.IO.Ports;
 using System.Threading;
 using DirectShowLib;
 using triggerCam.Camera;
@@ -276,8 +277,27 @@ namespace triggerCam
         private static void InitializeSerialListener(AppSettings settings)
         {
                 serialListener?.Dispose();
+
+                string portName = settings.ComPort;
+                var ports = SerialPort.GetPortNames();
+                if (!string.IsNullOrEmpty(portName) && !ports.Contains(portName, StringComparer.OrdinalIgnoreCase))
+                {
+                        if (ports.Length > 0)
+                        {
+                                MessageBox.Show(
+                                        $"指定されたポート {portName} が見つかりません。{ports[0]} を使用します。",
+                                        "COMポート警告",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Warning);
+                                portName = ports[0];
+                                settings.ComPort = portName;
+                                settings.Save();
+                        }
+                }
+
                 serialListener = new SerialTriggerListener(
-                                settings.ComPort,
+                                portName,
+
                                 settings.BaudRate,
                                 settings.SnapTrigger,
                                 settings.StartTrigger,
