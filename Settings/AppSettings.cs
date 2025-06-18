@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.Diagnostics;
 using System.Collections.Generic;
 
+
 namespace triggerCam.Settings
 {
 	/// <summary>
