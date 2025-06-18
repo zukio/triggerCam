@@ -7,8 +7,8 @@ namespace triggerCam.Settings
 	/// </summary>
 	public class AppSettings
 	{
-		private static readonly string SettingsFilePath = Path.Combine(
-				AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+                private static string settingsFilePath = Path.Combine(
+                                AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
 		// シングルトンインスタンス
 		private static AppSettings? _instance;
@@ -136,16 +136,31 @@ namespace triggerCam.Settings
 		{
 			try
 			{
-				if (File.Exists(SettingsFilePath))
-				{
-					string json = File.ReadAllText(SettingsFilePath);
-					var settings = JsonSerializer.Deserialize<AppSettings>(json);
-					if (settings != null)
-					{
-						Console.WriteLine("Settings loaded from file");
-						return settings;
-					}
-				}
+                                string[] paths = new[]
+                                {
+                                        settingsFilePath,
+                                        Path.Combine(Environment.CurrentDirectory, "settings.json")
+                                };
+
+                                foreach (var path in paths)
+                                {
+                                        if (File.Exists(path))
+                                        {
+                                                string json = File.ReadAllText(path);
+                                                var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions
+                                                {
+                                                        PropertyNameCaseInsensitive = true,
+                                                        AllowTrailingCommas = true,
+                                                        ReadCommentHandling = JsonCommentHandling.Skip
+                                                });
+                                                if (settings != null)
+                                                {
+                                                        settingsFilePath = path;
+                                                        Console.WriteLine($"Settings loaded from {path}");
+                                                        return settings;
+                                                }
+                                        }
+                                }
 			}
 			catch (Exception ex)
 			{
@@ -165,7 +180,7 @@ namespace triggerCam.Settings
 			try
 			{
 				string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-				File.WriteAllText(SettingsFilePath, json);
+                                File.WriteAllText(settingsFilePath, json);
 				Console.WriteLine("Settings saved to file");
 			}
 			catch (Exception ex)
