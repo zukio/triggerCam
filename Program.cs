@@ -274,6 +274,40 @@ namespace triggerCam
                 InitializeSerialListener(settings);
         }
 
+        public static void UpdateCameraSettings(AppSettings settings)
+        {
+                Notify("success", "disConnected");
+                cameraRecorder?.Dispose();
+
+                cameraRecorder = new CameraRecorder(
+                                settings.CameraIndex,
+                                settings.CameraSaveDirectory,
+                                settings.FrameRate,
+                                settings.CaptureMode);
+
+                cameraRecorder.SnapshotSaved += path =>
+                {
+                        var data = new Dictionary<string, object> { { "path", path } };
+                        Notify(snapshotSource, "SnapSaved", data);
+                };
+
+                cameraRecorder.VideoSaved += path =>
+                {
+                        var data = new Dictionary<string, object> { { "path", path } };
+                        Notify(recordSource, "RecStop", data);
+                        trayIcon?.UpdateRecordingState(false);
+                };
+
+                cameraRecorder.SetupCamera();
+                var camName = GetCameraName(settings.CameraIndex);
+                var conData = new Dictionary<string, object>
+                                {
+                                                { "id", settings.CameraIndex },
+                                                { "name", camName }
+                                };
+                Notify("success", "Connected", conData);
+        }
+
         private static void InitializeSerialListener(AppSettings settings)
         {
                 serialListener?.Dispose();
