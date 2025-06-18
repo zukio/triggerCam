@@ -297,6 +297,7 @@ namespace triggerCam
 
                 serialListener = new SerialTriggerListener(
                                 portName,
+
                                 settings.BaudRate,
                                 settings.SnapTrigger,
                                 settings.StartTrigger,
