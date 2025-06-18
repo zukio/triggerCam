@@ -129,9 +129,8 @@ namespace triggerCam.Settings
 		/// </summary>
 		public int RecordingTimeoutMinutes { get; set; } = 10;
 
-		// コンストラクタ
-                [JsonConstructor]
-                private AppSettings() { }
+                // コンストラクタ
+                public AppSettings() { }
 
 		/// <summary>
 		/// 設定を読み込む
