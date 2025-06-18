@@ -35,8 +35,9 @@ namespace triggerCam
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrayIcon));
 			this.context = new ContextMenuStrip(this.components);
-			this.contextMenu_serialContainer = new HorizontalMultiControlToolStripItem();
-			this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
+                        this.contextMenu_serialContainer = new HorizontalMultiControlToolStripItem();
+                        this.contextMenu_triggerStrings = new TriggerStringsToolStripItem();
+                        this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
 			this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
 			this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
@@ -55,9 +56,10 @@ namespace triggerCam
 			this.context.AccessibleRole = AccessibleRole.Cursor;
 			this.context.BackColor = SystemColors.Window;
 			this.context.ImageScalingSize = new Size(28, 28);
-			this.context.Items.AddRange(new ToolStripItem[] {
-																												this.contextMenu_serialContainer,
-																												this.contextMenu_cameraControlsContainer,
+                        this.context.Items.AddRange(new ToolStripItem[] {
+                                                                               this.contextMenu_serialContainer,
+                                                                               this.contextMenu_triggerStrings,
+                                                                               this.contextMenu_cameraControlsContainer,
 																												this.contextMenu_recordingsDirLabel,
 																												this.contextMenu_recordingsPath,
 																												this.contextMenu_imageFormatContainer,
@@ -80,8 +82,14 @@ namespace triggerCam
 			this.contextMenu_comPortSelect.SelectedIndexChanged += OnSettingChanged;
 			var labelBaud = this.contextMenu_serialContainer.AddLabel("ボーレート:");
 			this.contextMenu_baudRateSelect = this.contextMenu_serialContainer.AddComboBox(100);
-			this.contextMenu_baudRateSelect.Name = "contextMenu_baudRateSelect";
-			this.contextMenu_baudRateSelect.SelectedIndexChanged += OnSettingChanged;
+                        this.contextMenu_baudRateSelect.Name = "contextMenu_baudRateSelect";
+                        this.contextMenu_baudRateSelect.SelectedIndexChanged += OnSettingChanged;
+
+                        //
+                        // contextMenu_triggerStrings
+                        //
+                        this.contextMenu_triggerStrings.Name = "contextMenu_triggerStrings";
+                        this.contextMenu_triggerStrings.SettingsChanged += OnSettingChanged;
 			//
 			// contextMenu_cameraControlsContainer
 			//
@@ -199,10 +207,11 @@ namespace triggerCam
 		#endregion
 
 		private ContextMenuStrip context;
-		private HorizontalMultiControlToolStripItem contextMenu_serialContainer;
-		private ComboBox contextMenu_comPortSelect;
-		private ComboBox contextMenu_baudRateSelect;
-		private HorizontalMultiControlToolStripItem contextMenu_cameraControlsContainer;
+                private HorizontalMultiControlToolStripItem contextMenu_serialContainer;
+                private ComboBox contextMenu_comPortSelect;
+                private ComboBox contextMenu_baudRateSelect;
+                private TriggerStringsToolStripItem contextMenu_triggerStrings;
+                private HorizontalMultiControlToolStripItem contextMenu_cameraControlsContainer;
 		private Button contextMenu_triggerSnap;
 		private Button contextMenu_triggerStart;
 		private Button contextMenu_triggerStop;

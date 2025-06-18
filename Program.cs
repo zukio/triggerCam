@@ -99,7 +99,12 @@ namespace triggerCam
 			Notify("success", "Connected", conData);
 
 			// シリアルトリガーリスナーの初期化
-			serialListener = new SerialTriggerListener(settings.ComPort, settings.BaudRate);
+                        serialListener = new SerialTriggerListener(
+                                        settings.ComPort,
+                                        settings.BaudRate,
+                                        settings.SnapTrigger,
+                                        settings.StartTrigger,
+                                        settings.StopTrigger);
 			serialListener.SnapReceived += () =>
 			{
 				SetSnapshotSource("serial");
@@ -314,14 +319,29 @@ namespace triggerCam
 							i++;
 							break;
 
-						case "--baud":
-						case "-b":
-							if (int.TryParse(value, out int baudRate))
-							{
-								settings.BaudRate = baudRate;
-							}
-							i++;
-							break;
+                                                case "--baud":
+                                                case "-b":
+                                                        if (int.TryParse(value, out int baudRate))
+                                                        {
+                                                                settings.BaudRate = baudRate;
+                                                        }
+                                                        i++;
+                                                        break;
+
+                                                case "--snap":
+                                                        settings.SnapTrigger = value;
+                                                        i++;
+                                                        break;
+
+                                                case "--starttrig":
+                                                        settings.StartTrigger = value;
+                                                        i++;
+                                                        break;
+
+                                                case "--stoptrig":
+                                                        settings.StopTrigger = value;
+                                                        i++;
+                                                        break;
 
 						case "--camera":
 						case "-cam":
@@ -438,6 +458,9 @@ namespace triggerCam
 基本設定:
   --com, -c <ポート名>        シリアルポートを指定 (例: COM1)
   --baud, -b <ボーレート>      ボーレートを指定 (例: 9600)
+  --snap <文字列>             静止画トリガー文字列
+  --starttrig <文字列>        録画開始トリガー文字列
+  --stoptrig <文字列>         録画停止トリガー文字列
   --camera, -cam <インデックス> カメラインデックスを指定 (例: 0)
   --dir, -d <ディレクトリ>     録画・撮影データの保存先を指定
 

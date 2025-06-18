@@ -48,9 +48,10 @@ namespace triggerCam
 			contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
 			contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
 			contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
-			contextMenu_udpSettings.AddressChanged += OnAddressChanged;
-			contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
-			contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
+                        contextMenu_udpSettings.AddressChanged += OnAddressChanged;
+                        contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
+                        contextMenu_triggerStrings.SettingsChanged += OnSettingChanged;
+                        contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
 
 			LoadSettings();
 
@@ -111,9 +112,12 @@ namespace triggerCam
                         int modeIndex = (settings.CaptureMode == 0) ? 0 : 1;
                         contextMenu_modeContainer.SelectedIndex = modeIndex;
 
-			contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
-			contextMenu_udpSettings.Address = settings.UdpToAddress;
-			contextMenu_udpSettings.UdpEnabled = settings.UdpEnabled;
+                        contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
+                        contextMenu_udpSettings.Address = settings.UdpToAddress;
+                        contextMenu_udpSettings.UdpEnabled = settings.UdpEnabled;
+                        contextMenu_triggerStrings.SnapTrigger = settings.SnapTrigger;
+                        contextMenu_triggerStrings.StartTrigger = settings.StartTrigger;
+                        contextMenu_triggerStrings.StopTrigger = settings.StopTrigger;
 
 			// モードに応じたフォーマット設定の読み込みはUpdateButtonVisibilityで行う
 
@@ -204,9 +208,12 @@ namespace triggerCam
 			}
 
 			settings.CameraIndex = camIdx;
-			settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
-			settings.UdpToAddress = contextMenu_udpSettings.Address;
-			settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
+                        settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
+                        settings.UdpToAddress = contextMenu_udpSettings.Address;
+                        settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
+                        settings.SnapTrigger = contextMenu_triggerStrings.SnapTrigger;
+                        settings.StartTrigger = contextMenu_triggerStrings.StartTrigger;
+                        settings.StopTrigger = contextMenu_triggerStrings.StopTrigger;
                         // 現在のモードを保存
                         settings.CaptureMode = contextMenu_modeContainer.SelectedIndex;
 

@@ -105,6 +105,24 @@ namespace triggerCam.Controls
         }
 
         /// <summary>
+        /// TextBoxを追加します
+        /// </summary>
+        /// <param name="width">テキストボックスの幅</param>
+        /// <returns>追加されたTextBox</returns>
+        public TextBox AddTextBox(int width = 100)
+        {
+            var textBox = new TextBox
+            {
+                Width = width,
+                Margin = new Padding(3, 3, 3, 3)
+            };
+
+            _flowPanel.Controls.Add(textBox);
+            _controls.Add(textBox);
+            return textBox;
+        }
+
+        /// <summary>
         /// 指定したインデックスのコントロールを取得します
         /// </summary>
         /// <param name="index">インデックス</param>
