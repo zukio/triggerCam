@@ -138,8 +138,11 @@ namespace triggerCam.Settings
 			{
 				if (File.Exists(SettingsFilePath))
 				{
-					string json = File.ReadAllText(SettingsFilePath);
-					var settings = JsonSerializer.Deserialize<AppSettings>(json);
+                                string json = File.ReadAllText(SettingsFilePath);
+                                var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions
+                                {
+                                        PropertyNameCaseInsensitive = true
+                                });
 					if (settings != null)
 					{
 						Console.WriteLine("Settings loaded from file");
