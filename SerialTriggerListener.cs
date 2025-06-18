@@ -26,7 +26,9 @@ namespace triggerCam
             this.stopCommand = stopCommand;
             port = new SerialPort(portName, baudRate)
             {
-                NewLine = "\n"
+                NewLine = "\n",
+                DtrEnable = true,
+                RtsEnable = true
             };
         }
 
@@ -35,7 +37,19 @@ namespace triggerCam
             port.DataReceived += OnDataReceived;
             try
             {
-                port.Open();
+                if (!SerialPort.GetPortNames().Contains(port.PortName))
+                {
+                    MessageBox.Show(
+                        $"指定されたポート {port.PortName} が見つかりません。",
+                        "COMポートエラー",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    global::LogWriter.AddErrorLog($"Port {port.PortName} not found", nameof(Start));
+                    return;
+                }
+
+                if (!port.IsOpen)
+                    port.Open();
             }
             catch (PlatformNotSupportedException)
             {
@@ -49,7 +63,7 @@ namespace triggerCam
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is InvalidOperationException)
             {
                 MessageBox.Show(
-                    "シリアル通信ポートが未接続です。設定を確認してください。",
+                    $"シリアル通信ポートに接続できませんでした:\n{ex.Message}",
                     "COMポートエラー",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);

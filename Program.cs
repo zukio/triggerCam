@@ -98,34 +98,8 @@ namespace triggerCam
 						};
 			Notify("success", "Connected", conData);
 
-			// シリアルトリガーリスナーの初期化
-                        serialListener = new SerialTriggerListener(
-                                        settings.ComPort,
-                                        settings.BaudRate,
-                                        settings.SnapTrigger,
-                                        settings.StartTrigger,
-                                        settings.StopTrigger);
-			serialListener.SnapReceived += () =>
-			{
-				SetSnapshotSource("serial");
-				cameraRecorder!.TakeSnapshot(CreateFileName());
-			};
-			serialListener.StartReceived += () =>
-			{
-				SetRecordSource("serial");
-				cameraRecorder!.StartRecording(CreateFileName());
-				Notify("serial", "RecStart");
-				trayIcon?.UpdateRecordingState(true);
-				StartRecordingTimeout();
-			};
-			serialListener.StopReceived += () =>
-			{
-				SetRecordSource("serial");
-				cameraRecorder!.StopRecording();
-				StopRecordingTimeout();
-			};
-
-			serialListener.Start();
+                        // シリアルトリガーリスナーの初期化
+                        InitializeSerialListener(settings);
 
 			ApplicationConfiguration.Initialize();
 
@@ -279,10 +253,10 @@ namespace triggerCam
 			Notify("success", "disConnected");
 		}
 
-		public static void UpdateUdpEnabled(bool enabled)
-		{
-			var settings = AppSettings.Instance;
-			settings.UdpEnabled = enabled;
+        public static void UpdateUdpEnabled(bool enabled)
+        {
+                var settings = AppSettings.Instance;
+                settings.UdpEnabled = enabled;
 
 			if (enabled)
 			{
@@ -291,8 +265,45 @@ namespace triggerCam
 			else
 			{
 				StopUdpServices();
-			}
-		}
+                }
+        }
+
+        public static void UpdateSerialSettings(AppSettings settings)
+        {
+                InitializeSerialListener(settings);
+        }
+
+        private static void InitializeSerialListener(AppSettings settings)
+        {
+                serialListener?.Dispose();
+                serialListener = new SerialTriggerListener(
+                                settings.ComPort,
+                                settings.BaudRate,
+                                settings.SnapTrigger,
+                                settings.StartTrigger,
+                                settings.StopTrigger);
+                serialListener.SnapReceived += () =>
+                {
+                        SetSnapshotSource("serial");
+                        cameraRecorder!.TakeSnapshot(CreateFileName());
+                };
+                serialListener.StartReceived += () =>
+                {
+                        SetRecordSource("serial");
+                        cameraRecorder!.StartRecording(CreateFileName());
+                        Notify("serial", "RecStart");
+                        trayIcon?.UpdateRecordingState(true);
+                        StartRecordingTimeout();
+                };
+                serialListener.StopReceived += () =>
+                {
+                        SetRecordSource("serial");
+                        cameraRecorder!.StopRecording();
+                        StopRecordingTimeout();
+                };
+
+                serialListener.Start();
+        }
 
 		/// <summary>
 		/// コマンドライン引数を処理する

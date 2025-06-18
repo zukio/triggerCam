@@ -229,7 +229,8 @@ namespace triggerCam
 				settings.VideoCodec = contextMenu_codecContainer.ComboBoxText.ToUpper();
 			}
 
-			settings.Save();
+                        settings.Save();
+                        Program.UpdateSerialSettings(settings);
 
 			var addressParts = settings.UdpToAddress.Split(':');
 			if (addressParts.Length == 2 && int.TryParse(addressParts[1], out int port))
