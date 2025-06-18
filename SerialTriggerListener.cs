@@ -37,17 +37,6 @@ namespace triggerCam
             port.DataReceived += OnDataReceived;
             try
             {
-                if (!SerialPort.GetPortNames().Contains(port.PortName))
-                {
-                    MessageBox.Show(
-                        $"指定されたポート {port.PortName} が見つかりません。",
-                        "COMポートエラー",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    global::LogWriter.AddErrorLog($"Port {port.PortName} not found", nameof(Start));
-                    return;
-                }
-
                 if (!port.IsOpen)
                     port.Open();
             }
@@ -63,7 +52,7 @@ namespace triggerCam
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is InvalidOperationException)
             {
                 MessageBox.Show(
-                    $"シリアル通信ポートに接続できませんでした:\n{ex.Message}",
+                    $"指定されたポート {port.PortName} に接続できません:\n{ex.Message}",
                     "COMポートエラー",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
