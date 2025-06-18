@@ -38,7 +38,22 @@ namespace triggerCam.Settings
 		/// <summary>
 		/// シリアル通信のボーレート
 		/// </summary>
-		public int BaudRate { get; set; } = 9600;
+                public int BaudRate { get; set; } = 9600;
+
+                /// <summary>
+                /// 静止画撮影トリガー文字列
+                /// </summary>
+                public string SnapTrigger { get; set; } = "SNAP";
+
+                /// <summary>
+                /// 録画開始トリガー文字列
+                /// </summary>
+                public string StartTrigger { get; set; } = "START";
+
+                /// <summary>
+                /// 録画停止トリガー文字列
+                /// </summary>
+                public string StopTrigger { get; set; } = "STOP";
 
 		/// <summary>
 		/// 使用するカメラのインデックス
