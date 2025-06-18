@@ -76,10 +76,15 @@ namespace triggerCam.Settings
 		/// </summary>
 		public int ImageQuality { get; set; } = 95;
 
-		/// <summary>
-		/// 静止画のフォーマット (png, jpg, etc.)
-		/// </summary>
-		public string ImageFormat { get; set; } = "png";
+                /// <summary>
+                /// 静止画のフォーマット (png, jpg, etc.)
+                /// </summary>
+                public string ImageFormat { get; set; } = "png";
+
+                /// <summary>
+                /// 起動時の撮影モード (0=静止画, 1=動画)
+                /// </summary>
+                public int CaptureMode { get; set; } = 1;
 
 		/// <summary>
 		/// コマンド受信用のUDPアドレス
