@@ -116,11 +116,15 @@ namespace triggerCam.UDP
 			try
 			{
 				// 受信したデータを表示
-				Console.WriteLine($"Received raw data: {data.rcvString}");
+                                string raw = $"Received raw data: {data.rcvString}";
+                                Console.WriteLine(raw);
+                                global::LogWriter.AddLog(raw);
 
 				// 文字列を正規化（全角括弧を半角に変換など）
 				string normalizedJson = NormalizeJsonString(data.rcvString);
-				Console.WriteLine($"Normalized JSON: {normalizedJson}");
+                                string normalizedLog = $"Normalized JSON: {normalizedJson}";
+                                Console.WriteLine(normalizedLog);
+                                global::LogWriter.AddLog(normalizedLog);
 
 				// JSONとしてパース
 				var options = new JsonSerializerOptions
@@ -132,11 +136,14 @@ namespace triggerCam.UDP
 				var command = JsonSerializer.Deserialize<CommandData>(normalizedJson, options);
 				if (command == null)
 				{
-					Console.WriteLine("Invalid command format");
+                                        Console.WriteLine("Invalid command format");
+                                        global::LogWriter.AddLog("Invalid command format");
 					return;
 				}
 
-				Console.WriteLine($"Received command: {command.command}, params: {command.param}");
+                                string cmdLog = $"Received command: {command.command}, params: {command.param}";
+                                Console.WriteLine(cmdLog);
+                                global::LogWriter.AddLog(cmdLog);
 
 				// 現在のモードでコマンドが許可されているかチェック
 				if (!IsCommandAllowedInCurrentMode(command.command))
@@ -600,7 +607,9 @@ namespace triggerCam.UDP
 			}
                         catch (Exception ex)
                         {
-                                Console.WriteLine($"Error processing command: {ex.Message}");
+                                string errLog = $"Error processing command: {ex.Message}";
+                                Console.WriteLine(errLog);
+                                global::LogWriter.AddLog(errLog);
                                 global::LogWriter.AddErrorLog(ex, nameof(ProcessCommand));
                                 SendResponse(new ResponseData { status = "error", message = $"Error: {ex.Message}" });
                         }

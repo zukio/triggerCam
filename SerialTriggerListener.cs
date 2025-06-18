@@ -39,6 +39,7 @@ namespace triggerCam
             {
                 if (!port.IsOpen)
                     port.Open();
+                global::LogWriter.AddLog($"Serial port opened: {port.PortName} @{port.BaudRate}bps");
             }
             catch (PlatformNotSupportedException)
             {
@@ -65,12 +66,22 @@ namespace triggerCam
             try
             {
                 string line = port.ReadLine().Trim();
+                global::LogWriter.AddLog($"Serial received: {line}");
                 if (line.Equals(snapCommand, StringComparison.OrdinalIgnoreCase))
+                {
+                    global::LogWriter.AddLog("Snap command detected");
                     SnapReceived?.Invoke();
+                }
                 else if (line.Equals(startCommand, StringComparison.OrdinalIgnoreCase))
+                {
+                    global::LogWriter.AddLog("Start command detected");
                     StartReceived?.Invoke();
+                }
                 else if (line.Equals(stopCommand, StringComparison.OrdinalIgnoreCase))
+                {
+                    global::LogWriter.AddLog("Stop command detected");
                     StopReceived?.Invoke();
+                }
             }
             catch (Exception ex)
             {
@@ -80,7 +91,11 @@ namespace triggerCam
 
         public void Dispose()
         {
-            if (port.IsOpen) port.Close();
+            if (port.IsOpen)
+            {
+                port.Close();
+                global::LogWriter.AddLog($"Serial port closed: {port.PortName}");
+            }
             port.Dispose();
         }
     }
