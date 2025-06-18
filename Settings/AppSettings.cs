@@ -1,5 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Diagnostics;
+using System.Collections.Generic;
+
 
 namespace triggerCam.Settings
 {
@@ -8,8 +11,8 @@ namespace triggerCam.Settings
 	/// </summary>
 	public class AppSettings
 	{
-                private static string settingsFilePath = Path.Combine(
-                                AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+        private static string settingsFilePath = Path.Combine(
+                                AppContext.BaseDirectory, "settings.json");
 
 		// シングルトンインスタンス
 		private static AppSettings? _instance;
@@ -134,15 +137,20 @@ namespace triggerCam.Settings
 		/// 設定を読み込む
 		/// </summary>
 		/// <returns>読み込んだ設定、またはデフォルト設定</returns>
-		public static AppSettings Load()
-		{
-			try
-			{
-                                string[] paths = new[]
+                public static AppSettings Load()
+                {
+                        try
+                        {
+                                var paths = new List<string>
                                 {
                                         settingsFilePath,
                                         Path.Combine(Environment.CurrentDirectory, "settings.json")
                                 };
+                                if (!string.IsNullOrEmpty(Environment.ProcessPath))
+                                {
+                                        string exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty;
+                                        paths.Add(Path.Combine(exeDir, "settings.json"));
+                                }
 
                                 foreach (var path in paths)
                                 {
