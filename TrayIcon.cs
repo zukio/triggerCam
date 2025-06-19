@@ -253,15 +253,20 @@ namespace triggerCam
 			}
 		}
 
-		private void contextMenu_openRecordingsDir_Click(object sender, EventArgs e)
-		{
-			string path = contextMenu_recordingsPath.Path;
-			if (!Directory.Exists(path))
-				Directory.CreateDirectory(path);
-			Process.Start("explorer.exe", $"\"{path}\"");
-		}
-		private void contextMenu_exit_Click(object sender, EventArgs e)
-		{
+                private void contextMenu_openRecordingsDir_Click(object sender, EventArgs e)
+                {
+                        string path = contextMenu_recordingsPath.Path;
+                        if (!Directory.Exists(path))
+                                Directory.CreateDirectory(path);
+                        Process.Start("explorer.exe", $"\"{path}\"");
+                }
+
+                private void contextMenu_refreshDevices_Click(object sender, EventArgs e)
+                {
+                        RefreshDeviceLists();
+                }
+                private void contextMenu_exit_Click(object sender, EventArgs e)
+                {
 			// UDPServerを先に停止してから終了するようにプログラムを修正
 			Program.CleanupBeforeExit();
 			Application.Exit();
@@ -531,20 +536,68 @@ namespace triggerCam
 		/// 外部からモードを設定
 		/// </summary>
 		/// <param name="modeIndex">設定するモード (0:静止画, 1:動画)</param>
-		public void SetMode(int modeIndex)
-		{
-			if (uiContext == null) return;
+                public void SetMode(int modeIndex)
+                {
+                        if (uiContext == null) return;
 
-			// UIスレッドで実行
-			uiContext.Post(_ =>
-			{
-				if (modeIndex >= 0 && modeIndex < contextMenu_modeContainer.Items.Count)
-				{
-					contextMenu_modeContainer.SelectedIndex = modeIndex;
-					// OnModeChangedイベントが自動的に呼ばれる
-				}
-			}, null);
-		}
+                        // UIスレッドで実行
+                        uiContext.Post(_ =>
+                        {
+                                if (modeIndex >= 0 && modeIndex < contextMenu_modeContainer.Items.Count)
+                                {
+                                        contextMenu_modeContainer.SelectedIndex = modeIndex;
+                                        // OnModeChangedイベントが自動的に呼ばれる
+                                }
+                        }, null);
+                }
+
+                /// <summary>
+                /// デバイス一覧を再取得してコンボボックスを更新
+                /// </summary>
+                private void RefreshDeviceLists()
+                {
+                        if (uiContext == null) return;
+
+                        uiContext.Post(_ =>
+                        {
+                                // 現在の選択を保持
+                                string currentPort = contextMenu_comPortSelect.Text;
+                                string currentCamera = contextMenu_cameraSelect.Text;
+
+                                // Serial ports
+                                contextMenu_comPortSelect.Items.Clear();
+                                var ports = SerialPort.GetPortNames();
+                                if (ports.Length > 0)
+                                {
+                                        contextMenu_comPortSelect.Items.AddRange(ports);
+                                        int idx = Array.IndexOf(ports, currentPort);
+                                        contextMenu_comPortSelect.SelectedIndex = idx >= 0 ? idx : 0;
+                                }
+                                else
+                                {
+                                        contextMenu_comPortSelect.Items.Add("シリアルポート");
+                                        contextMenu_comPortSelect.SelectedIndex = 0;
+                                }
+
+                                // Cameras
+                                contextMenu_cameraSelect.Items.Clear();
+                                var cameraDevices = GetCameraDeviceList();
+                                bool found = false;
+                                foreach (var cam in cameraDevices)
+                                {
+                                        contextMenu_cameraSelect.Items.Add(cam.Description);
+                                        if (cam.Description == currentCamera)
+                                        {
+                                                contextMenu_cameraSelect.SelectedIndex = contextMenu_cameraSelect.Items.Count - 1;
+                                                found = true;
+                                        }
+                                }
+                                if (!found && contextMenu_cameraSelect.Items.Count > 0)
+                                {
+                                        contextMenu_cameraSelect.SelectedIndex = 0;
+                                }
+                        }, null);
+                }
 
 		/// <summary>
 		/// システム内のすべてのカメラデバイスの名前と情報を取得します
