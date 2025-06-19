@@ -7,6 +7,7 @@ using System.Net.Sockets;
 public class UDPServer : IDisposable // IDisposable インターフェースを実装
 {
     UdpClient udp = new UdpClient();
+    private bool _disposed = false;
 
     public string UDP_LocalAddress = "127.0.0.1";
     public int UDP_LocalPort = 10000;
@@ -39,8 +40,13 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
 
     public void Dispose()
     {
-        // UdpClient インスタンスを解放
-        udp?.Dispose();
+        _disposed = true;
+        if (udp != null)
+        {
+            udp.Close();
+            udp.Dispose();
+            udp = null;
+        }
         global::LogWriter.AddLog($"UDP server closed on port {UDP_LocalPort}");
     }
 
@@ -48,12 +54,11 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
     {
         try
         {
+            if (_disposed || udp == null)
+                return;
             // データの受信
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
-
-            if (udp == null)
-                return;
-
+            
             // バイト型のデータを取得
             Byte[] rcvBytes = udp.EndReceive(ar, ref remoteEP);
             // 構造体の作成
@@ -73,6 +78,10 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
             string log = $"UDP Received: IP {data.ip} Port {data.port} >> {data.rcvString}";
             Console.WriteLine(log);
             global::LogWriter.AddLog(log);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Socket was closed; ignore further processing
         }
         catch (Exception error)
         {
