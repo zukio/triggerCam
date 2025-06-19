@@ -182,7 +182,7 @@ namespace triggerCam
 			}
 		}
 
-		private static string CreateFileName() => DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                internal static string CreateFileName() => DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
 
 		private static void StartUdpServices()
 		{
