@@ -29,7 +29,7 @@ public class UDPServer : IDisposable // IDisposable インターフェースを�
 
     private void Init()
     {
-        udp = new UdpClient(UDP_LocalPort);
+        udp = new UdpClient(new IPEndPoint(IPAddress.Parse(UDP_LocalAddress), UDP_LocalPort));
 
         // 非同期受信を開始
         udp.BeginReceive(ReceiveCallback, udp);
