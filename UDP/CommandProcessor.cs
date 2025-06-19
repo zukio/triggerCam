@@ -4,6 +4,8 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Windows.Forms;
+using System.IO.Ports;
+using DirectShowLib;
 using triggerCam.Camera;
 using triggerCam.Settings;
 using triggerCam;
@@ -522,24 +524,48 @@ namespace triggerCam.UDP
 						}
 						break;
 
-					case "get_settings":
-						try
-						{
-							// 現在のカメラ設定を取得
-							var currentSettings = cameraRecorder.GetSettings();
+                                        case "get_settings":
+                                                try
+                                                {
+                                                        // UIのデバイスリストも更新
+                                                        trayIcon?.RefreshDeviceLists();
 
-							SendResponse(new ResponseData
-							{
-								status = "success",
-								message = "Camera settings",
-								data = currentSettings
-							});
-						}
-						catch (Exception ex)
-						{
-							SendResponse(new ResponseData { status = "error", message = $"Failed to get settings: {ex.Message}" });
-						}
-						break;
+                                                        // 現在のカメラ設定を取得
+                                                        var currentSettings = cameraRecorder.GetSettings();
+
+                                                        // デバイスリストを取得
+                                                        string[] ports = Array.Empty<string>();
+                                                        try { ports = SerialPort.GetPortNames(); } catch { }
+
+                                                        var cameraNames = new List<string>();
+                                                        try
+                                                        {
+                                                                var videoDevices = new List<DsDevice>(DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice));
+                                                                for (int i = 0; i < videoDevices.Count; i++)
+                                                                {
+                                                                        cameraNames.Add($"{i}: {videoDevices[i].Name}");
+                                                                }
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                                global::LogWriter.AddErrorLog(ex, "GetCameraDeviceList");
+                                                        }
+
+                                                        currentSettings["serialPorts"] = ports;
+                                                        currentSettings["cameraDevices"] = cameraNames;
+
+                                                        SendResponse(new ResponseData
+                                                        {
+                                                                status = "success",
+                                                                message = "Camera settings",
+                                                                data = currentSettings
+                                                        });
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                        SendResponse(new ResponseData { status = "error", message = $"Failed to get settings: {ex.Message}" });
+                                                }
+                                                break;
 
 					case "set_mode":
 						try

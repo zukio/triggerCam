@@ -137,8 +137,9 @@ namespace triggerCam
 		private void ContextOpened(object? sender, EventArgs e)
 		{
 			isContextMenuOpen = true;
-			contextMenu_save.Enabled = false;
-		}
+                        contextMenu_save.Enabled = false;
+                        RefreshDeviceLists();
+                }
 
 		private void ContextClosing(object? sender, ToolStripDropDownClosingEventArgs e)
 		{
@@ -240,8 +241,9 @@ namespace triggerCam
 				udpToPort = port;
 			}
 
-			contextMenu_save.Enabled = false;
-		}
+                        contextMenu_save.Enabled = false;
+                        RefreshDeviceLists();
+                }
 
 		private void contextMenu_browseRecordingsDir_Click(object sender, EventArgs e)
 		{
@@ -551,11 +553,11 @@ namespace triggerCam
 			}, null);
 		}
 
-		/// <summary>
-		/// デバイス一覧を再取得してコンボボックスを更新
-		/// </summary>
-		private void RefreshDeviceLists()
-		{
+                /// <summary>
+                /// デバイス一覧を再取得してコンボボックスを更新
+                /// </summary>
+                public void RefreshDeviceLists()
+                {
 			if (uiContext == null) return;
 
 			uiContext.Post(_ =>
