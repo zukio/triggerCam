@@ -40,7 +40,8 @@ namespace triggerCam
                         this.contextMenu_cameraControlsContainer = new HorizontalMultiControlToolStripItem();
 			this.contextMenu_recordingsDirLabel = new ToolStripMenuItem();
 			this.contextMenu_recordingsPath = new RecordingPathToolStripItem();
-			this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
+                        this.contextMenu_openRecordingsDir = new ToolStripMenuItem();
+                        this.contextMenu_refreshDevices = new ToolStripMenuItem();
 			this.contextMenu_udpSettings = new UdpSettingsToolStripItem();
 			this.contextMenu_cameraSettingsSeparator = new ToolStripSeparator();
 			this.contextMenu_imageFormatContainer = new HorizontalLayoutToolStripItem("画像形式:", 100);
@@ -65,8 +66,9 @@ namespace triggerCam
 																												this.contextMenu_imageFormatContainer,
 																												this.contextMenu_codecContainer,
 																												this.contextMenu_recordingStatus,
-																												this.contextMenu_openRecordingsDir,
-																												this.contextMenu_udpSettings,
+                                                                               this.contextMenu_openRecordingsDir,
+                                                                               this.contextMenu_refreshDevices,
+                                                                               this.contextMenu_udpSettings,
 																												this.contextMenu_cameraSettingsSeparator,
 																												this.contextMenu_save,
 																												this.contextMenu_exit
@@ -167,12 +169,19 @@ namespace triggerCam
 			// 
 			// contextMenu_openRecordingsDir
 			// 
-			this.contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
-			this.contextMenu_openRecordingsDir.Size = new Size(331, 36);
-			this.contextMenu_openRecordingsDir.Text = "保存済データを開く";
-			this.contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
-			//
-			// contextMenu_udpEnabled
+                        this.contextMenu_openRecordingsDir.Name = "contextMenu_openRecordingsDir";
+                        this.contextMenu_openRecordingsDir.Size = new Size(331, 36);
+                        this.contextMenu_openRecordingsDir.Text = "保存済データを開く";
+                        this.contextMenu_openRecordingsDir.Click += contextMenu_openRecordingsDir_Click;
+                        //
+                        // contextMenu_refreshDevices
+                        //
+                        this.contextMenu_refreshDevices.Name = "contextMenu_refreshDevices";
+                        this.contextMenu_refreshDevices.Size = new Size(331, 36);
+                        this.contextMenu_refreshDevices.Text = "デバイス一覧を更新";
+                        this.contextMenu_refreshDevices.Click += contextMenu_refreshDevices_Click;
+                        //
+                        // contextMenu_udpEnabled
 			//
 			this.contextMenu_udpSettings.Name = "contextMenu_udpSettings";
 			this.contextMenu_udpSettings.Size = new Size(271, 30);
@@ -222,8 +231,9 @@ namespace triggerCam
 		private NotifyIcon notifyIcon1;
 		private ToolStripMenuItem contextMenu_recordingsDirLabel;
 		private RecordingPathToolStripItem contextMenu_recordingsPath;
-		private ToolStripMenuItem contextMenu_openRecordingsDir;
-		private UdpSettingsToolStripItem contextMenu_udpSettings;
+                private ToolStripMenuItem contextMenu_openRecordingsDir;
+                private ToolStripMenuItem contextMenu_refreshDevices;
+                private UdpSettingsToolStripItem contextMenu_udpSettings;
 		private ToolStripSeparator contextMenu_cameraSettingsSeparator;
 		private ToolStripMenuItem contextMenu_recordingStatus;
 		private HorizontalLayoutToolStripItem contextMenu_imageFormatContainer;
