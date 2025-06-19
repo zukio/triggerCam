@@ -177,7 +177,7 @@ namespace triggerCam.UDP
 								try
 								{
 									var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
-									fileName = paramObj?.GetValueOrDefault("fileName") ?? DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                                                                        fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
 								}
 								catch
 								{
@@ -187,7 +187,7 @@ namespace triggerCam.UDP
 							}
 							else
 							{
-								fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                                                                fileName = Program.CreateFileName();
 							}
 							Program.SetSnapshotSource("success");
 
@@ -255,7 +255,7 @@ namespace triggerCam.UDP
 									try
 									{
 										var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
-										fileName = paramObj?.GetValueOrDefault("fileName") ?? DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                                                                               fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
 									}
 									catch
 									{
@@ -265,7 +265,7 @@ namespace triggerCam.UDP
 								}
 								else
 								{
-									fileName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                                                                        fileName = Program.CreateFileName();
 								}
 								Program.SetRecordSource("success");
 
