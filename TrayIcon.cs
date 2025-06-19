@@ -48,10 +48,10 @@ namespace triggerCam
 			contextMenu_cameraSelect.SelectedIndexChanged += OnSettingChanged;
 			contextMenu_modeContainer.SelectedIndexChanged += OnModeChanged;
 			contextMenu_imageFormatContainer.SelectedIndexChanged += OnSettingChanged;
-                        contextMenu_udpSettings.AddressChanged += OnAddressChanged;
-                        contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
-                        contextMenu_triggerStrings.SettingsChanged += OnSettingChanged;
-                        contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
+			contextMenu_udpSettings.AddressChanged += OnAddressChanged;
+			contextMenu_udpSettings.UdpEnabledChanged += contextMenu_udpSettings_CheckedChanged;
+			contextMenu_triggerStrings.SettingsChanged += OnSettingChanged;
+			contextMenu_codecContainer.SelectedIndexChanged += OnSettingChanged;
 
 			LoadSettings();
 
@@ -106,18 +106,18 @@ namespace triggerCam
 				contextMenu_cameraSelect.SelectedIndex = 0;
 			}
 
-                        // モード設定
-                        contextMenu_modeContainer.Items.Clear();
-                        contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
-                        int modeIndex = (settings.CaptureMode == 0) ? 0 : 1;
-                        contextMenu_modeContainer.SelectedIndex = modeIndex;
+			// モード設定
+			contextMenu_modeContainer.Items.Clear();
+			contextMenu_modeContainer.Items.AddRange(new object[] { "静止画", "動画" });
+			int modeIndex = (settings.CaptureMode == 0) ? 0 : 1;
+			contextMenu_modeContainer.SelectedIndex = modeIndex;
 
-                        contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
-                        contextMenu_udpSettings.Address = settings.UdpToAddress;
-                        contextMenu_udpSettings.UdpEnabled = settings.UdpEnabled;
-                        contextMenu_triggerStrings.SnapTrigger = settings.SnapTrigger;
-                        contextMenu_triggerStrings.StartTrigger = settings.StartTrigger;
-                        contextMenu_triggerStrings.StopTrigger = settings.StopTrigger;
+			contextMenu_recordingsPath.Path = settings.CameraSaveDirectory;
+			contextMenu_udpSettings.Address = settings.UdpToAddress;
+			contextMenu_udpSettings.UdpEnabled = settings.UdpEnabled;
+			contextMenu_triggerStrings.SnapTrigger = settings.SnapTrigger;
+			contextMenu_triggerStrings.StartTrigger = settings.StartTrigger;
+			contextMenu_triggerStrings.StopTrigger = settings.StopTrigger;
 
 			// モードに応じたフォーマット設定の読み込みはUpdateButtonVisibilityで行う
 
@@ -208,18 +208,18 @@ namespace triggerCam
 			}
 
 			settings.CameraIndex = camIdx;
-                        settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
-                        settings.UdpToAddress = contextMenu_udpSettings.Address;
-                        settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
-                        settings.SnapTrigger = contextMenu_triggerStrings.SnapTrigger;
-                        settings.StartTrigger = contextMenu_triggerStrings.StartTrigger;
-                        settings.StopTrigger = contextMenu_triggerStrings.StopTrigger;
-                        // 現在のモードを保存
-                        settings.CaptureMode = contextMenu_modeContainer.SelectedIndex;
+			settings.CameraSaveDirectory = contextMenu_recordingsPath.Path;
+			settings.UdpToAddress = contextMenu_udpSettings.Address;
+			settings.UdpEnabled = contextMenu_udpSettings.UdpEnabled;
+			settings.SnapTrigger = contextMenu_triggerStrings.SnapTrigger;
+			settings.StartTrigger = contextMenu_triggerStrings.StartTrigger;
+			settings.StopTrigger = contextMenu_triggerStrings.StopTrigger;
+			// 現在のモードを保存
+			settings.CaptureMode = contextMenu_modeContainer.SelectedIndex;
 
-                        // モードに応じた設定の保存
-                        if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
-                        {
+			// モードに応じた設定の保存
+			if (contextMenu_modeContainer.SelectedIndex == 0) // 静止画モード
+			{
 				// 画像形式の保存
 				settings.ImageFormat = contextMenu_imageFormatContainer.ComboBoxText.ToLower();
 			}
@@ -229,9 +229,9 @@ namespace triggerCam
 				settings.VideoCodec = contextMenu_codecContainer.ComboBoxText.ToUpper();
 			}
 
-                        settings.Save();
-                        Program.UpdateSerialSettings(settings);
-                        Program.UpdateCameraSettings(settings);
+			settings.Save();
+			Program.UpdateSerialSettings(settings);
+			Program.UpdateCameraSettings(settings);
 
 			var addressParts = settings.UdpToAddress.Split(':');
 			if (addressParts.Length == 2 && int.TryParse(addressParts[1], out int port))
@@ -253,20 +253,20 @@ namespace triggerCam
 			}
 		}
 
-                private void contextMenu_openRecordingsDir_Click(object sender, EventArgs e)
-                {
-                        string path = contextMenu_recordingsPath.Path;
-                        if (!Directory.Exists(path))
-                                Directory.CreateDirectory(path);
-                        Process.Start("explorer.exe", $"\"{path}\"");
-                }
+		private void contextMenu_openRecordingsDir_Click(object sender, EventArgs e)
+		{
+			string path = contextMenu_recordingsPath.Path;
+			if (!Directory.Exists(path))
+				Directory.CreateDirectory(path);
+			Process.Start("explorer.exe", $"\"{path}\"");
+		}
 
-                private void contextMenu_refreshDevices_Click(object sender, EventArgs e)
-                {
-                        RefreshDeviceLists();
-                }
-                private void contextMenu_exit_Click(object sender, EventArgs e)
-                {
+		private void contextMenu_refreshDevices_Click(object sender, EventArgs e)
+		{
+			RefreshDeviceLists();
+		}
+		private void contextMenu_exit_Click(object sender, EventArgs e)
+		{
 			// UDPServerを先に停止してから終了するようにプログラムを修正
 			Program.CleanupBeforeExit();
 			Application.Exit();
@@ -464,11 +464,11 @@ namespace triggerCam
 			// 録画状態ラベルの更新
 			if (isImageMode)
 			{
-				contextMenu_recordingStatus.Text = "モード: 静止画撮影" + cameraInfo;
+				contextMenu_recordingStatus.Text = "撮影モード：静止画" + cameraInfo;
 			}
 			else
 			{
-				contextMenu_recordingStatus.Text = (isRecording ? "録画状態: 録画中" : "録画状態: 停止中") + cameraInfo;
+				contextMenu_recordingStatus.Text = (isRecording ? "撮影モード：録画（録画中）" : "撮影モード：録画（停止中）") + cameraInfo;
 			}
 		}
 
@@ -481,7 +481,7 @@ namespace triggerCam
 			var cameraRecorder = Program.GetCameraRecorder();
 			if (cameraRecorder != null)
 			{
-                                string fileName = Program.CreateFileName();
+				string fileName = Program.CreateFileName();
 				Program.SetSnapshotSource("manual");
 				cameraRecorder.TakeSnapshot(fileName);
 			}
@@ -496,7 +496,7 @@ namespace triggerCam
 			var cameraRecorder = Program.GetCameraRecorder();
 			if (cameraRecorder != null && !isRecording)
 			{
-                                string fileName = Program.CreateFileName();
+				string fileName = Program.CreateFileName();
 				Program.SetRecordSource("manual");
 				cameraRecorder.StartRecording(fileName);
 				Program.Notify("manual", "RecStart");
@@ -536,68 +536,68 @@ namespace triggerCam
 		/// 外部からモードを設定
 		/// </summary>
 		/// <param name="modeIndex">設定するモード (0:静止画, 1:動画)</param>
-                public void SetMode(int modeIndex)
-                {
-                        if (uiContext == null) return;
+		public void SetMode(int modeIndex)
+		{
+			if (uiContext == null) return;
 
-                        // UIスレッドで実行
-                        uiContext.Post(_ =>
-                        {
-                                if (modeIndex >= 0 && modeIndex < contextMenu_modeContainer.Items.Count)
-                                {
-                                        contextMenu_modeContainer.SelectedIndex = modeIndex;
-                                        // OnModeChangedイベントが自動的に呼ばれる
-                                }
-                        }, null);
-                }
+			// UIスレッドで実行
+			uiContext.Post(_ =>
+			{
+				if (modeIndex >= 0 && modeIndex < contextMenu_modeContainer.Items.Count)
+				{
+					contextMenu_modeContainer.SelectedIndex = modeIndex;
+					// OnModeChangedイベントが自動的に呼ばれる
+				}
+			}, null);
+		}
 
-                /// <summary>
-                /// デバイス一覧を再取得してコンボボックスを更新
-                /// </summary>
-                private void RefreshDeviceLists()
-                {
-                        if (uiContext == null) return;
+		/// <summary>
+		/// デバイス一覧を再取得してコンボボックスを更新
+		/// </summary>
+		private void RefreshDeviceLists()
+		{
+			if (uiContext == null) return;
 
-                        uiContext.Post(_ =>
-                        {
-                                // 現在の選択を保持
-                                string currentPort = contextMenu_comPortSelect.Text;
-                                string currentCamera = contextMenu_cameraSelect.Text;
+			uiContext.Post(_ =>
+			{
+				// 現在の選択を保持
+				string currentPort = contextMenu_comPortSelect.Text;
+				string currentCamera = contextMenu_cameraSelect.Text;
 
-                                // Serial ports
-                                contextMenu_comPortSelect.Items.Clear();
-                                var ports = SerialPort.GetPortNames();
-                                if (ports.Length > 0)
-                                {
-                                        contextMenu_comPortSelect.Items.AddRange(ports);
-                                        int idx = Array.IndexOf(ports, currentPort);
-                                        contextMenu_comPortSelect.SelectedIndex = idx >= 0 ? idx : 0;
-                                }
-                                else
-                                {
-                                        contextMenu_comPortSelect.Items.Add("シリアルポート");
-                                        contextMenu_comPortSelect.SelectedIndex = 0;
-                                }
+				// Serial ports
+				contextMenu_comPortSelect.Items.Clear();
+				var ports = SerialPort.GetPortNames();
+				if (ports.Length > 0)
+				{
+					contextMenu_comPortSelect.Items.AddRange(ports);
+					int idx = Array.IndexOf(ports, currentPort);
+					contextMenu_comPortSelect.SelectedIndex = idx >= 0 ? idx : 0;
+				}
+				else
+				{
+					contextMenu_comPortSelect.Items.Add("シリアルポート");
+					contextMenu_comPortSelect.SelectedIndex = 0;
+				}
 
-                                // Cameras
-                                contextMenu_cameraSelect.Items.Clear();
-                                var cameraDevices = GetCameraDeviceList();
-                                bool found = false;
-                                foreach (var cam in cameraDevices)
-                                {
-                                        contextMenu_cameraSelect.Items.Add(cam.Description);
-                                        if (cam.Description == currentCamera)
-                                        {
-                                                contextMenu_cameraSelect.SelectedIndex = contextMenu_cameraSelect.Items.Count - 1;
-                                                found = true;
-                                        }
-                                }
-                                if (!found && contextMenu_cameraSelect.Items.Count > 0)
-                                {
-                                        contextMenu_cameraSelect.SelectedIndex = 0;
-                                }
-                        }, null);
-                }
+				// Cameras
+				contextMenu_cameraSelect.Items.Clear();
+				var cameraDevices = GetCameraDeviceList();
+				bool found = false;
+				foreach (var cam in cameraDevices)
+				{
+					contextMenu_cameraSelect.Items.Add(cam.Description);
+					if (cam.Description == currentCamera)
+					{
+						contextMenu_cameraSelect.SelectedIndex = contextMenu_cameraSelect.Items.Count - 1;
+						found = true;
+					}
+				}
+				if (!found && contextMenu_cameraSelect.Items.Count > 0)
+				{
+					contextMenu_cameraSelect.SelectedIndex = 0;
+				}
+			}, null);
+		}
 
 		/// <summary>
 		/// システム内のすべてのカメラデバイスの名前と情報を取得します

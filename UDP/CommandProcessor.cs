@@ -116,15 +116,15 @@ namespace triggerCam.UDP
 			try
 			{
 				// 受信したデータを表示
-                                string raw = $"Received raw data: {data.rcvString}";
-                                Console.WriteLine(raw);
-                                global::LogWriter.AddLog(raw);
+				string raw = $"Received raw data: {data.rcvString}";
+				Console.WriteLine(raw);
+				global::LogWriter.AddLog(raw);
 
 				// 文字列を正規化（全角括弧を半角に変換など）
 				string normalizedJson = NormalizeJsonString(data.rcvString);
-                                string normalizedLog = $"Normalized JSON: {normalizedJson}";
-                                Console.WriteLine(normalizedLog);
-                                global::LogWriter.AddLog(normalizedLog);
+				string normalizedLog = $"Normalized JSON: {normalizedJson}";
+				Console.WriteLine(normalizedLog);
+				global::LogWriter.AddLog(normalizedLog);
 
 				// JSONとしてパース
 				var options = new JsonSerializerOptions
@@ -136,14 +136,14 @@ namespace triggerCam.UDP
 				var command = JsonSerializer.Deserialize<CommandData>(normalizedJson, options);
 				if (command == null)
 				{
-                                        Console.WriteLine("Invalid command format");
-                                        global::LogWriter.AddLog("Invalid command format");
+					Console.WriteLine("Invalid command format");
+					global::LogWriter.AddLog("Invalid command format");
 					return;
 				}
 
-                                string cmdLog = $"Received command: {command.command}, params: {command.param}";
-                                Console.WriteLine(cmdLog);
-                                global::LogWriter.AddLog(cmdLog);
+				string cmdLog = $"Received command: {command.command}, params: {command.param}";
+				Console.WriteLine(cmdLog);
+				global::LogWriter.AddLog(cmdLog);
 
 				// 現在のモードでコマンドが許可されているかチェック
 				if (!IsCommandAllowedInCurrentMode(command.command))
@@ -177,7 +177,7 @@ namespace triggerCam.UDP
 								try
 								{
 									var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
-                                                                        fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
+									fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
 								}
 								catch
 								{
@@ -187,7 +187,7 @@ namespace triggerCam.UDP
 							}
 							else
 							{
-                                                                fileName = Program.CreateFileName();
+								fileName = Program.CreateFileName();
 							}
 							Program.SetSnapshotSource("success");
 
@@ -255,7 +255,7 @@ namespace triggerCam.UDP
 									try
 									{
 										var paramObj = JsonSerializer.Deserialize<Dictionary<string, string>>(command.param);
-                                                                               fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
+										fileName = paramObj?.GetValueOrDefault("fileName") ?? Program.CreateFileName();
 									}
 									catch
 									{
@@ -265,7 +265,7 @@ namespace triggerCam.UDP
 								}
 								else
 								{
-                                                                        fileName = Program.CreateFileName();
+									fileName = Program.CreateFileName();
 								}
 								Program.SetRecordSource("success");
 
@@ -293,9 +293,9 @@ namespace triggerCam.UDP
 								}
 								string fullPath = Path.Combine(saveDir, fileName + ".mp4");
 
-                                                                StartRecording(fileName, customPath);
-                                                                Program.Notify("success", "RecStart");
-                                                                Program.StartRecordingTimeout();
+								StartRecording(fileName, customPath);
+								Program.Notify("success", "RecStart");
+								Program.StartRecordingTimeout();
 								// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
 								//SendResponse(new ResponseData
 								//{
@@ -326,8 +326,8 @@ namespace triggerCam.UDP
 							Program.SetRecordSource("success");
 
 							// 録画を停止（VideoSavedイベントが発生する）
-                                                        StopRecording();
-                                                        Program.StopRecordingTimeout();
+							StopRecording();
+							Program.StopRecordingTimeout();
 
 							// CameraRecorderクラスでVideoSavedイベントが発火し、実際のファイルパスを含む通知が送信されます
 							//SendResponse(new ResponseData
@@ -575,10 +575,10 @@ namespace triggerCam.UDP
 								// CameraRecorderのモードも更新
 								cameraRecorder.CaptureMode = modeIndex;
 
-                                                                // 設定を保存
-                                                                var settings = AppSettings.Instance;
-                                                                settings.CaptureMode = modeIndex;
-                                                                settings.Save();
+								// 設定を保存
+								var settings = AppSettings.Instance;
+								settings.CaptureMode = modeIndex;
+								settings.Save();
 
 								SendResponse(new ResponseData
 								{
@@ -605,14 +605,14 @@ namespace triggerCam.UDP
 						break;
 				}
 			}
-                        catch (Exception ex)
-                        {
-                                string errLog = $"Error processing command: {ex.Message}";
-                                Console.WriteLine(errLog);
-                                global::LogWriter.AddLog(errLog);
-                                global::LogWriter.AddErrorLog(ex, nameof(ProcessCommand));
-                                SendResponse(new ResponseData { status = "error", message = $"Error: {ex.Message}" });
-                        }
+			catch (Exception ex)
+			{
+				string errLog = $"Error processing command: {ex.Message}";
+				Console.WriteLine(errLog);
+				global::LogWriter.AddLog(errLog);
+				global::LogWriter.AddErrorLog(ex, nameof(ProcessCommand));
+				SendResponse(new ResponseData { status = "error", message = $"Error: {ex.Message}" });
+			}
 		}
 
 		/// <summary>

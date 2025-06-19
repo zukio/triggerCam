@@ -11,8 +11,8 @@ namespace triggerCam.Settings
 	/// </summary>
 	public class AppSettings
 	{
-        private static string settingsFilePath = Path.Combine(
-                                AppContext.BaseDirectory, "settings.json");
+		private static string settingsFilePath = Path.Combine(
+														AppContext.BaseDirectory, "settings.json");
 
 		// シングルトンインスタンス
 		private static AppSettings? _instance;
@@ -42,22 +42,22 @@ namespace triggerCam.Settings
 		/// <summary>
 		/// シリアル通信のボーレート
 		/// </summary>
-                public int BaudRate { get; set; } = 9600;
+		public int BaudRate { get; set; } = 9600;
 
-                /// <summary>
-                /// 静止画撮影トリガー文字列
-                /// </summary>
-                public string SnapTrigger { get; set; } = "SNAP";
+		/// <summary>
+		/// 静止画撮影トリガー文字列
+		/// </summary>
+		public string SnapTrigger { get; set; } = "SNAP";
 
-                /// <summary>
-                /// 録画開始トリガー文字列
-                /// </summary>
-                public string StartTrigger { get; set; } = "START";
+		/// <summary>
+		/// 録画開始トリガー文字列
+		/// </summary>
+		public string StartTrigger { get; set; } = "START";
 
-                /// <summary>
-                /// 録画停止トリガー文字列
-                /// </summary>
-                public string StopTrigger { get; set; } = "STOP";
+		/// <summary>
+		/// 録画停止トリガー文字列
+		/// </summary>
+		public string StopTrigger { get; set; } = "STOP";
 
 		/// <summary>
 		/// 使用するカメラのインデックス
@@ -95,15 +95,15 @@ namespace triggerCam.Settings
 		/// </summary>
 		public int ImageQuality { get; set; } = 95;
 
-                /// <summary>
-                /// 静止画のフォーマット (png, jpg, etc.)
-                /// </summary>
-                public string ImageFormat { get; set; } = "png";
+		/// <summary>
+		/// 静止画のフォーマット (png, jpg, etc.)
+		/// </summary>
+		public string ImageFormat { get; set; } = "png";
 
-                /// <summary>
-                /// 起動時の撮影モード (0=静止画, 1=動画)
-                /// </summary>
-                public int CaptureMode { get; set; } = 1;
+		/// <summary>
+		/// 起動時の撮影モード (0=静止画, 1=動画)
+		/// </summary>
+		public int CaptureMode { get; set; } = 1;
 
 		/// <summary>
 		/// コマンド受信用のUDPアドレス
@@ -129,47 +129,47 @@ namespace triggerCam.Settings
 		/// </summary>
 		public int RecordingTimeoutMinutes { get; set; } = 10;
 
-                // コンストラクタ
-                public AppSettings() { }
+		// コンストラクタ
+		public AppSettings() { }
 
 		/// <summary>
 		/// 設定を読み込む
 		/// </summary>
 		/// <returns>読み込んだ設定、またはデフォルト設定</returns>
-                public static AppSettings Load()
-                {
-                        try
-                        {
-                                var paths = new List<string>
-                                {
-                                        settingsFilePath,
-                                        Path.Combine(Environment.CurrentDirectory, "settings.json")
-                                };
-                                if (!string.IsNullOrEmpty(Environment.ProcessPath))
-                                {
-                                        string exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty;
-                                        paths.Add(Path.Combine(exeDir, "settings.json"));
-                                }
+		public static AppSettings Load()
+		{
+			try
+			{
+				var paths = new List<string>
+																{
+																				settingsFilePath,
+																				Path.Combine(Environment.CurrentDirectory, "settings.json")
+																};
+				if (!string.IsNullOrEmpty(Environment.ProcessPath))
+				{
+					string exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty;
+					paths.Add(Path.Combine(exeDir, "settings.json"));
+				}
 
-                                foreach (var path in paths)
-                                {
-                                        if (File.Exists(path))
-                                        {
-                                                string json = File.ReadAllText(path);
-                                                var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions
-                                                {
-                                                        PropertyNameCaseInsensitive = true,
-                                                        AllowTrailingCommas = true,
-                                                        ReadCommentHandling = JsonCommentHandling.Skip
-                                                });
-                                                if (settings != null)
-                                                {
-                                                        settingsFilePath = path;
-                                                        Console.WriteLine($"Settings loaded from {path}");
-                                                        return settings;
-                                                }
-                                        }
-                                }
+				foreach (var path in paths)
+				{
+					if (File.Exists(path))
+					{
+						string json = File.ReadAllText(path);
+						var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions
+						{
+							PropertyNameCaseInsensitive = true,
+							AllowTrailingCommas = true,
+							ReadCommentHandling = JsonCommentHandling.Skip
+						});
+						if (settings != null)
+						{
+							settingsFilePath = path;
+							Console.WriteLine($"Settings loaded from {path}");
+							return settings;
+						}
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -189,7 +189,7 @@ namespace triggerCam.Settings
 			try
 			{
 				string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-                                File.WriteAllText(settingsFilePath, json);
+				File.WriteAllText(settingsFilePath, json);
 				Console.WriteLine("Settings saved to file");
 			}
 			catch (Exception ex)
